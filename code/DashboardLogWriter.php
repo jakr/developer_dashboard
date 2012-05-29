@@ -2,9 +2,9 @@
 class DashboardLogWriter {
 	private $streamID;
 	private $logWriter;
-	/* Number of requests that are stored */
+	/** Number of requests that are stored */
 	public static $REQUESTS = 10;
-	public static $LOG_FILE_PATH = '';
+	public static $LOG_FILE_PATH = null;
 	private static $DEFAULT_LOG_FILE_PATH = '/../../debug.log';
 	private static $requestNumber = -1;
 	private static $messages = array();
@@ -28,11 +28,15 @@ class DashboardLogWriter {
 	 * 
 	 * This should be called from the global error handler, 
 	 *  to ensure that messages are output even if an error occured.
-	 * @return array the logged messages, one message per entry. 
+	 * @return array the logged messages as strings, one message per entry. 
 	 */
 	public static function getLogFileMessages(){
 		self::loadSavedMessagesFromSession();
-		return self::$messages[self::$requestNumber];
+		$ret = array();
+		foreach(self::$messages[self::$requestNumber] as $message){
+			$ret[] = $message->__toString();
+		}
+		return $ret;
 	}
 	
 	/**
@@ -45,10 +49,10 @@ class DashboardLogWriter {
 	 *   requestNumber=>array('message1', 'message2',...). 
 	 */
 	public static function getMessagesFromSession($newerThan = 0){
-		$ret = array();
 		self::loadSavedMessagesFromSession();
+		$ret = array();
 		foreach(self::$messages as $key=>$messages){
-			if($key < $newerThan) continue;
+			if($key <= $newerThan) continue;
 			$ret[$key] = $messages;
 		}
 		return $ret;
@@ -83,14 +87,10 @@ class DashboardLogWriter {
 	 * @param string $streamID
 	 * @param int $timestamp
 	 */
-	public static function log($message, $streamID = 'DEFAULT',
-			$timestamp = null){
-		if($timestamp == null){
-			$timestamp = time();
-		}
+	public static function log($message, $streamID = 'DEFAULT'){
 		self::loadSavedMessagesFromSession();
 		self::$messages[self::$requestNumber][] = 
-			"[$streamID] $timestamp $message";
+			new DashboardLogMessage($message, $streamID);
 		Session::set(self::$SESSION_DATA_KEY, self::$messages);
 		Session::save();
 	}
@@ -112,7 +112,15 @@ class DashboardLogWriter {
 			self::$messages = array();
 			self::$requestNumber = 0;
 		} else {
-			self::$requestNumber = count(array_keys(self::$messages));
+			$keys = array_keys(self::$messages);
+			self::$requestNumber = end($keys) + 1;
+			//remove old requests.
+			$elements = count($keys) + 1;
+			if($elements + 1 > self::$REQUESTS){
+				for($i=0; $i<$elements-self::$REQUESTS; $i++){
+					unset(self::$messages[$keys[$i]]);
+				}
+			}
 		}
 		self::$messages[self::$requestNumber] = array(); 
 	}
@@ -123,7 +131,7 @@ class DashboardLogWriter {
 	 * @return string the log file path.
 	 */
 	private static function getLogFilePath(){
-		if(self::$LOG_FILE_PATH == ''){
+		if(self::$LOG_FILE_PATH == null){
 			 return dirname(__FILE__).self::$DEFAULT_LOG_FILE;
 		} elseif (substr(self::$LOG_FILE_PATH, 0, 2) == '..'){
 			 return dirname(__FILE__).'/'.self::$LOG_FILE_PATH;

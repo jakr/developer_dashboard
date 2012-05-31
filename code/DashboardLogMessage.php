@@ -1,8 +1,8 @@
 <?php
-class DashboardLogMessage {
-	public $streamID;
-	public $timestamp;
-	public $message;
+class DashboardLogMessage extends ViewableData {
+	public $StreamID;
+	public $Timestamp;
+	public $Message;
 	
 	/**
 	 * Construct from a Zend_Log message.
@@ -10,12 +10,12 @@ class DashboardLogMessage {
 	 * @param string $streamID
 	 */
 	public function __construct($event, $streamID){
-		$this->message = $event['message'];
-		$this->streamID = $streamID;
-		$this->timestamp = $event['timestamp'];
+		$this->Message = $event['message'];
+		$this->StreamID = $streamID;
+		$this->Timestamp = $event['timestamp'];
 	}
 	
 	public function __toString(){
-		return "[{$this->streamID}] {$this->timestamp} {$this->message}";
+		return "[{$this->StreamID}] {$this->Timestamp} {$this->Message}";
 	}
 }

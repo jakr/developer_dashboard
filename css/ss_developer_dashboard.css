@@ -1,24 +1,27 @@
-#SSDD_ToggleUpdate span {
-	display: inline-block;
+#SSDD-toggle-update {
+	margin: 1em;
+}
+#SSDD-toggle-update .ss-ui-button {
+	margin-left: 1em;
 	padding: 1em;
 	width: 2em;
 	text-align: center;
 }
-#SSDD_ToggleUpdate.on span {
+#SSDD-toggle-update.on .ss-ui-button {
 	background-color: green;
 	color: white;
 }
-#SSDD_ToggleUpdate.off span {
+#SSDD-toggle-update.off .ss-ui-button {
 	background-color: grey;
 	color: black;
 }
-#SSDD_ToggleUpdate .progress {
+#SSDD-toggle-update .progress {
 	margin-left: 1em;
 	display: inline-block;
 	background-color: blue;
 	width: 4em;
 	opacity: 0.75;
 }
-#SSDD_ToggleUpdate.off .progress {
+#SSDD-toggle-update.off .progress {
 	display: none;
 }

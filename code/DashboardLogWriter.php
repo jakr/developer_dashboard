@@ -63,12 +63,16 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	 *   requestNumber=>array('message1', 'message2',...). 
 	 */
 	public static function getMessagesFromSession($newerThan = 0){
-		$ret = array();
+		$requests = new ArrayList();
 		foreach(self::$messages as $key=>$messages){
-			if($key <= $newerThan) continue;
-			$ret[$key] = $messages;
+			//skip every request older than $newerThan
+			if($newerThan > $key) continue;
+			$requests->push(new ArrayData(array(
+				'Children' => new ArrayList($messages),
+				'RequestID' => $key
+			)));
 		}
-		return $ret;
+		return $requests;
 	}
 	
 	private static function storeMessageInSession($messageObj){

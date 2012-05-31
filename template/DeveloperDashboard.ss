@@ -3,11 +3,12 @@
 <head>
 <title>SilverStripe Developer Dashboard</title>
 </head>
-<body>
+<body class="cms">
 <script type="text/javascript">
 DeveloperDashboardLogMessages.data = $GetLoggedDataAsJS;
 </script>
-<div id="DeveloperDashboardLogArea">
+Update: <div id="SSDD_ToggleUpdate" class="off"><span>off</span><div class="progress">&nbsp;</div></div>
+<div id="SSDD_LogArea">
 <pre>$GetLoggedData</pre>
 </div>
 </body>

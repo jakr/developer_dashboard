@@ -31,5 +31,6 @@ class DeveloperDashboard extends Controller {
 		parent::init();
 		Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery/jquery.js');
 		Requirements::javascript('developer_dashboard/javascript/dashboard_detached.js');
+		Requirements::css('developer_dashboard/css/ss_developer_dashboard.css');
 	}
 }

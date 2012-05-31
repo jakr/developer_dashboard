@@ -10,9 +10,9 @@ class DeveloperDashboard extends Controller {
 		$ret = '';
 		$js = '';
 		foreach($messages as $requestNr => $data){
-			$ret .= "==== $requestNr ====\n";
+			$ret .= "==== $requestNr ====<br />\n";
 			foreach($data as $datum){
-				$ret .= "$datum \n";
+				$ret .= "<span class=\"".$datum->streamID."\">$datum </span><br />";
 			}
 		}
 		return $ret;
@@ -25,6 +25,10 @@ class DeveloperDashboard extends Controller {
 		} else {
 			return $this->GetLoggedData();
 		}
+	}
+	
+	public function GetStreams(){
+		return DashboardLogWriter::getStreamIDs();
 	}
 	
 	public function init(){

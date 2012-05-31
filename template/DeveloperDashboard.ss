@@ -9,7 +9,7 @@ DeveloperDashboardLogMessages.data = $GetLoggedDataAsJS;
 </script>
 Update: <div id="SSDD_ToggleUpdate" class="off"><span>off</span><div class="progress">&nbsp;</div></div>
 <div id="SSDD_LogArea">
-<pre>$GetLoggedData</pre>
+$GetLoggedData
 </div>
 </body>
 </html>

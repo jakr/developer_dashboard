@@ -1,15 +1,21 @@
 <?php
 class DashboardLogMessage {
 	public $streamID;
-	public $time;
+	public $timestamp;
 	public $message;
-	public function __construct($message, $streamID){
-		$this->message = $message;
+	
+	/**
+	 * Construct from a Zend_Log message.
+	 * @param array $event a Zend_Log message
+	 * @param string $streamID
+	 */
+	public function __construct($event, $streamID){
+		$this->message = $event['message'];
 		$this->streamID = $streamID;
-		$this->time = time();
+		$this->timestamp = $event['timestamp'];
 	}
 	
 	public function __toString(){
-		return "[{$this->streamID}] {$this->time} {$this->message}";
+		return "[{$this->streamID}] {$this->timestamp} {$this->message}";
 	}
 }

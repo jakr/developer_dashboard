@@ -1,10 +1,11 @@
 var SSDD_refreshRate = 5000;
 var DeveloperDashboardLogMessages = new Object({
-	"elementToString":function(key){
-		var ret = "==== "+key +" ====\n";
+	"elementToHTML":function(key){
+		var ret = "==== "+key +" ====<br />\n";
 		for(var element in this.data[key]){
 			var e = this.data[key][element];
-			ret += '[' + e.streamID + '] ' + e.time + ' ' + e.message +"\n";
+			ret += '<span class="' + e.streamID + '">[' + e.streamID + '] ' 
+				+ e.timestamp + ' ' + e.message +"</span><br />\n";
 		}
 		return ret;
 	},
@@ -28,8 +29,8 @@ function developerDashboardGetNewData(){
 	jQuery.getJSON(url, function (json){
 		for(var key in json){
 			DeveloperDashboardLogMessages.data[key] = json[key];
-			jQuery("#SSDD_LogArea pre").append(
-					DeveloperDashboardLogMessages.elementToString(key));
+			jQuery("#SSDD_LogArea").append(
+					DeveloperDashboardLogMessages.elementToHTML(key));
 		}
 		jQuery('#SSDD_ToggleUpdate .progress').animate({width: '4em'}, 10).animate({
 			width: '0'}, SSDD_refreshRate*0.95);

@@ -1,5 +1,13 @@
-#SSDD-toggle-update {
+div#SSDD-toggle-update, div#SSDD-log-area {
 	margin: 1em;
+	padding: 1em;
+}
+.cms div#SSDD-log-area {
+	height: 80%;
+	overflow-y: auto;
+}
+#SSDD-log-area .request p {
+	margin-bottom: 0;
 }
 #SSDD-toggle-update .ss-ui-button {
 	margin-left: 1em;
@@ -24,4 +32,10 @@
 }
 #SSDD-toggle-update.off .progress {
 	display: none;
+}
+.toggle-stream-visibility{
+	border: 1px solid grey;
+} 
+.toggle-stream-visibility.on {
+	border-color: green;
 }

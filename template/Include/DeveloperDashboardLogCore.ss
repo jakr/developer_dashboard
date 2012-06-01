@@ -2,7 +2,7 @@
 <div class="request $RequestID">
 ==== $RequestID ====<br />
 <% loop $Children %>
-<span class="$StreamID">[$StreamID] $Timestamp $Message</span>
+<p class="$StreamID">[$StreamID] $Timestamp $Message</p>
 <% end_loop %>
 </div>
 <% end_loop %>

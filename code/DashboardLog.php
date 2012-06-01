@@ -1,25 +1,37 @@
 <?php
+require_once 'Zend/Log/Writer/Stream.php';
 class DashboardLog {
-	private static $loggers = array();
-	private static $logFileWriter = null;
-	private static $DEFAULT_LOG_FILE_PATH = '/../../debug.log';
-	public static $LOG_FILE_PATH = null;
+	/** 
+	 * @var string Override the default log file path with this path.
+	 * If the path starts with .. it is assumed to be relative to this
+	 *  file's location.
+	 */
+	public static $log_file_path = '../../debug.log';
 	
-	public static function init(){
-		if(self::$logFileWriter == null){
+	/** @var boolean If true the log messages are also written to a file. */
+	public static $copy_to_file = false;
+	
+	/** @var array the Zend_Log loggers that were created. */
+	private static $loggers = array();
+	/** @var Zend_Log_Writer_Stream The writer used to write to the log file. */
+	private static $log_file_writer = null;
+	
+	public static function init() {
+		if(self::$log_file_writer != null) {
 			return;
 		}
-		self::$logFileWriter = new Zend_Log_Writer_Stream(
-			self::getLogFilePath()); 
+		self::$log_file_writer = new Zend_Log_Writer_Stream(
+			self::get_log_file_path()); 
 	}
 	
-	public static function getLogger($streamID){
-		if(!isset(self::$loggers[$streamID])){
+	public static function get_logger($streamID) {
+		if(!isset(self::$loggers[$streamID])) {
 			$log = new Zend_Log();
-			$writer = DashboardLogWriter::getLogWriter($streamID);
+			$writer = DashboardLogWriter::get_log_writer($streamID);
 			$log->addWriter($writer);
-			print_r(self::$logFileWriter);
-			//$log->addWriter(self::$logFileWriter);
+			if(self::$log_file_writer != null && self::$copy_to_file){
+				$log->addWriter(self::$log_file_writer);
+			}
 			self::$loggers[$streamID] = $log;
 		}
 		return self::$loggers[$streamID];
@@ -33,8 +45,8 @@ class DashboardLog {
 	 * @param int $timestamp
 	 */
 	public static function log($message, $streamID = 'DEFAULT',
-		$priority = Zend_Log::INFO){
-		$logger = self::getLogger($streamID);
+			$priority = Zend_Log::INFO) {
+		$logger = self::get_logger($streamID);
 		$logger->log($message, $priority);
 	}
     
@@ -43,13 +55,11 @@ class DashboardLog {
 	 * 
 	 * @return string the log file path.
 	 */
-	private static function getLogFilePath(){
-		if(self::$LOG_FILE_PATH == null){
-			 return dirname(__FILE__).self::$DEFAULT_LOG_FILE;
-		} elseif (substr(self::$LOG_FILE_PATH, 0, 2) == '..'){
-			 return dirname(__FILE__).'/'.self::$LOG_FILE_PATH;
+	private static function get_log_file_path() {
+		if (substr(self::$log_file_path, 0, 2) == '..'){
+			 return dirname(__FILE__).'/'.self::$log_file_path;
 		} else { //assume absolute path
-			 return self::$LOG_FILE_PATH;
+			 return self::$log_file_path;
 		}
 	}
 	
@@ -61,10 +71,10 @@ class DashboardLog {
 	 *  'last' is the offset of the last line
 	 *  'text' is an array of lines.
 	 */
-	public static function readLogFile($offset=-1){
+	public static function read_log_file($offset=-1) {
 		$lines = array();
 		if($offset < 0) $offset = 0;
-		$file = fopen(self::getLogFilePath());
+		$file = fopen(self::get_log_file_path());
 		fseek($file, 0, SEEK_END);
 		$posEOF = ftell($file);
 		fseek($file, $offset);
@@ -76,4 +86,4 @@ class DashboardLog {
 	}
 	
 }
-DashboardLogWriter::init();
+DashboardLog::init();

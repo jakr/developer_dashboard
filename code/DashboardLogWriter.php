@@ -2,40 +2,23 @@
 require_once 'Zend/Log.php';
 require_once 'Zend/Log/Writer/Abstract.php';
 class DashboardLogWriter extends Zend_Log_Writer_Abstract {
-	private $streamID;
-	private static $copyToFile = false;
-	/** Number of requests that are stored */
-	public static $REQUESTS = 10;
-	private static $requestNumber = -1;
+	/** @var int Number of requests that are stored in the session */
+	public static $requests_to_keep = 10;
+	private static $request_number = -1;
 	private static $messages = array();
-	private static $logWriters = array();
-	private static $SESSION_DATA_KEY = 'DEVELOPER_DASHBOARD_LOG_MESSAGES';
+	private static $log_writers = array();
+	private static $session_data_key = 'DEVELOPER_DASHBOARD_LOG_MESSAGES';
 	
-	private function __construct($streamID, $copyToFile=true){
-		$this->streamID = $streamID;
-	}
+	private $streamID;
 	
 	/**
 	 * It is required to implement this method.
 	 *  
 	 * @param array $config
 	 */
-	public static function factory($config){
+	public static function factory($config) {
 		$streamID = isset($config['streamID']) ? $config['streamID'] : 'DEFAULT';
-		return self::getLogWriter($streamID);
-	}
-	
-	static function getLogWriter($streamID){
-		if(!isset(self::$logWriters[$streamID])){
-			self::$logWriters[$streamID] = 
-				new DashboardLogWriter($streamID);
-		}
-		return self::$logWriters[$streamID];
-	}
-
-	function _write($event){
-		self::storeMessageInSession(
-			new DashboardLogMessage($event, $this->streamID));
+		return self::get_log_writer($streamID);
 	}
 
 	/**
@@ -45,9 +28,9 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	 *  to ensure that messages are output even if an error occured.
 	 * @return array the logged messages as strings, one message per entry. 
 	 */
-	public static function getLogFileMessages(){
+	public static function get_log_file_messages() {
 		$ret = array();
-		foreach(self::$messages[self::$requestNumber] as $message){
+		foreach(self::$messages[self::$request_number] as $message){
 			$ret[] = $message->__toString();
 		}
 		return $ret;
@@ -59,14 +42,15 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	 *  than this request number are returned
 	 * 
 	 * @param int $newerThan 
-	 * @return array the messages as an array of 
-	 *   requestNumber=>array('message1', 'message2',...). 
+	 * @return ArrayList the messages. Each entry is an ArraData item with
+	 * 	two members: RequestID and Children. The Children are an ArrayList
+	 *  that contains the messages as DashboardLogMessage objects. 
 	 */
-	public static function getMessagesFromSession($newerThan = 0){
+	public static function get_messages_from_session($newerThan = 0) {
 		$requests = new ArrayList();
 		foreach(self::$messages as $key=>$messages){
 			//skip every request older than $newerThan
-			if($newerThan > $key) continue;
+			if($newerThan >= $key) continue;
 			$requests->push(new ArrayData(array(
 				'Children' => new ArrayList($messages),
 				'RequestID' => $key
@@ -75,14 +59,24 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 		return $requests;
 	}
 	
-	private static function storeMessageInSession($messageObj){
-		self::$messages[self::$requestNumber][] = $messageObj;
-		Session::set(self::$SESSION_DATA_KEY, self::$messages);
-		Session::save();
+	public static function get_log_writer($streamID) {
+		if(!isset(self::$log_writers[$streamID])){
+			self::$log_writers[$streamID] = 
+				new DashboardLogWriter($streamID);
+		}
+		return self::$log_writers[$streamID];
 	}
 	
-	public static function getStreamIDs(){
-		return array_keys(self::$logWriters);
+	/**
+	 * Get the available stream ids.
+	 * @return ArrayList each ArrayData item has an attribute StreamID.
+	 */
+	public static function get_stream_ids() {
+		$streamIds = new ArrayList();
+		foreach(array_keys(self::$log_writers) as $streamId){
+			$streamIds->push(new ArrayData(array('StreamID' => $streamId)));
+		}
+		return $streamIds;
 	}
 
 	/**
@@ -93,27 +87,43 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	 * It will only display messages from requests in the current session.
 	 * The function was previously called loadSavedMessagesFromSession.
 	 */
-	public static function init(){//
-		if(self::$requestNumber >= 0){ //function was already called.
+	public static function init() {
+		if(self::$request_number >= 0){ //function was already called.
 			return;
 		}
 		Session::start();
-		self::$messages = Session::get(self::$SESSION_DATA_KEY);
+		self::$messages = Session::get(self::$session_data_key);
 		if(self::$messages == null){
 			self::$messages = array();
-			self::$requestNumber = 0;
+			self::$request_number = 0;
 		} else {
 			$keys = array_keys(self::$messages);
-			self::$requestNumber = end($keys) + 1;
+			self::$request_number = end($keys) + 1;
 			//remove old requests.
 			$elements = count($keys) + 1;
-			if($elements + 1 > self::$REQUESTS){
-				for($i=0; $i<$elements-self::$REQUESTS; $i++){
+			if($elements + 1 > self::$requests_to_keep){
+				for($i=0; $i<$elements-self::$requests_to_keep; $i++){
 					unset(self::$messages[$keys[$i]]);
 				}
 			}
 		}
-		self::$messages[self::$requestNumber] = array(); 
+		self::$messages[self::$request_number] = array(); 
+	}
+	
+	private static function store_message_in_session($messageObj) {
+		self::$messages[self::$request_number][] = $messageObj;
+		Session::set(self::$session_data_key, self::$messages);
+		Session::save();
+	}
+	
+	private function __construct($streamID) {
+		$this->streamID = $streamID;
+	}
+
+	public function _write($event) {
+		self::store_message_in_session(
+			new DashboardLogMessage($event, $this->streamID));
 	}
 }
+//Make sure our class is initialized.
 DashboardLogWriter::init();

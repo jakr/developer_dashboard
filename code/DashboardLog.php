@@ -21,7 +21,8 @@ class DashboardLog {
 			return;
 		}
 		self::$log_file_writer = new Zend_Log_Writer_Stream(
-			self::get_log_file_path()); 
+			self::get_log_file_path()
+		); 
 	}
 	
 	public static function get_logger($streamID) {

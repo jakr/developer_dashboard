@@ -61,8 +61,7 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	
 	public static function get_log_writer($streamID) {
 		if(!isset(self::$log_writers[$streamID])){
-			self::$log_writers[$streamID] = 
-				new DashboardLogWriter($streamID);
+			self::$log_writers[$streamID] = new DashboardLogWriter($streamID);
 		}
 		return self::$log_writers[$streamID];
 	}
@@ -122,7 +121,8 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 
 	public function _write($event) {
 		self::store_message_in_session(
-			new DashboardLogMessage($event, $this->streamID));
+			new DashboardLogMessage($event, $this->streamID)
+		);
 	}
 }
 //Make sure our class is initialized.

@@ -7,7 +7,7 @@ var updateIntervalId = null;
 function developerDashboardGetNewData() {
 	var newestLogEntry = 0;
 	var lastEntry = jQuery("#SSDD-log-area .request").last().get(0);
-	if(typeof lastEntry != undefined) {
+	if(typeof lastEntry != 'undefined') {
 		newestLogEntry = lastEntry.className.split(' ')[1];
 	}
 	jQuery("#SSDD-log-area .request").each(function() {
@@ -36,6 +36,7 @@ function developerDashboardGetNewData() {
 	});
 }
 
+//click on the "toggle update" button, enables or disables updates via AJAX .
 jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
 	function() {
 		updateIntervalId = window.setInterval(
@@ -53,11 +54,18 @@ jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
 		jQuery('#SSDD-toggle-update .progress').stop().css('width', '4em');
 	}
 )});
-
+//turn on updates
 jQuery(function(){jQuery('#SSDD-toggle-update').click();});
+//display or hide a log stream
 jQuery(function() {
 	jQuery('.toggle-stream-visibility').click(function(){
 		jQuery('#SSDD-log-area .' + this.innerHTML).toggleClass('hide');
 		jQuery(this).toggleClass('on');
 	})
 });
+//If jQuery UI is enabled it copies the content of each tab. No clue why.
+//create tabs
+//jQuery(function() {
+//	if(jQuery('#SSDD-tabs').length == 0) { console.log("Empty");return; }
+//	jQuery('#SSDD-tabs').tabs();
+//});

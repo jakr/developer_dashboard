@@ -9,6 +9,7 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	private static $log_writers = array();
 	private static $session_data_key = 'DEVELOPER_DASHBOARD_LOG_MESSAGES';
 	
+	/** @var string the stream id of this log writer*/
 	private $streamID;
 	
 	/**

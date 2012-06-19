@@ -10,9 +10,11 @@ class DeveloperDashboard extends Controller {
 		parent::init();
 		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
 		Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery/jquery.min.js');
+		Requirements::javascript('developer_dashboard/thirdparty/bootstrap/js/bootstrap.min.js');
 		Requirements::javascript('developer_dashboard/javascript/dashboard_detached.js');
-		Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery-ui/jquery-ui.min.js');
+		//Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery-ui/jquery-ui.min.js');
 		Requirements::css(FRAMEWORK_DIR.'/thirdparty/jquery-ui-themes/smoothness/jquery-ui.css');
+		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard.css');
 		
 		$urlvarTab = new DashboardTab('URL Variable Tools', 'urlvariabletools');

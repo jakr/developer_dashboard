@@ -31,9 +31,17 @@ function developerDashboardGetNewData() {
 		jQuery("#SSDD-log-area").append(jqData);
 		//The animation runs a little faster
 		// to make sure the animation is finished before the next refresh.
-		jQuery('#SSDD-toggle-update .progress').animate({width: '4em'}, 10)
+		jQuery('#SSDD-toggle-update .ssdd-progress-bar').animate({width: '4em'}, 10)
 			.animate({width: '0'}, SSDD_refreshRate*0.95);
 	});
+}
+
+function hideStream(streamID){
+	jQuery('#SSDD-log-area .' + streamID).addClass('hide');
+}
+
+function showStream(streamID){
+	jQuery('#SSDD-log-area .' + streamID).removeClass('hide');
 }
 
 //click on the "toggle update" button, enables or disables updates via AJAX .
@@ -43,7 +51,7 @@ jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
 				"developerDashboardGetNewData()", SSDD_refreshRate);
 		jQuery(this).removeClass().addClass('on').children().first().
 			text('on').addClass('ss-ui-action-constructive');
-		jQuery('#SSDD-toggle-update .progress').animate({width: '4em'}, 10)
+		jQuery('#SSDD-toggle-update .ssdd-progress-bar').animate({width: '4em'}, 10)
 			.animate({width: '0'}, SSDD_refreshRate);
 	},
 	function() {
@@ -51,11 +59,12 @@ jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
 		updateIntervalId = null
 		jQuery(this).removeClass().addClass('off').children().first()
 			.text('off').removeClass('ss-ui-action-constructive');
-		jQuery('#SSDD-toggle-update .progress').stop().css('width', '4em');
+		jQuery('#SSDD-toggle-update .ssdd-progress-bar').stop().css('width', '4em');
 	}
 )});
 //turn on updates
 jQuery(function(){jQuery('#SSDD-toggle-update').click();});
+
 //display or hide a log stream
 jQuery(function() {
 	jQuery('.toggle-stream-visibility').click(function(){
@@ -63,9 +72,18 @@ jQuery(function() {
 		jQuery(this).toggleClass('on');
 	})
 });
-//If jQuery UI is enabled it copies the content of each tab. No clue why.
-//create tabs
-//jQuery(function() {
-//	if(jQuery('#SSDD-tabs').length == 0) { console.log("Empty");return; }
-//	jQuery('#SSDD-tabs').tabs();
-//});
+
+//tabs using bootstrap
+jQuery(function() {
+	if(jQuery('#SSDD-tabs').length == 0) { return; }
+	jQuery('#SSDD-tabs a').click(function (e) {
+		e.preventDefault();
+		jQuery(this).tab('show');
+	});
+});
+jQuery(function(){
+	//wire up enable and hide buttons.
+	//jQuery('.btn-group.toggle-stream-visibility')
+	// 	.dropdown-menu li
+	//});
+});

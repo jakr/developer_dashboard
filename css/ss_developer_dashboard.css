@@ -23,15 +23,18 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 	background-color: grey;
 	color: black;
 }
-#SSDD-toggle-update .progress {
+#SSDD-toggle-update .ssdd-progress-bar {
 	margin-left: 1em;
 	display: inline-block;
 	background-color: blue;
 	width: 4em;
 	opacity: 0.75;
 }
-#SSDD-toggle-update.off .progress {
+#SSDD-toggle-update.off .ssdd-progress-bar {
 	display: none;
+}
+div.toggle-stream-visibility {
+	float: left;
 }
 .toggle-stream-visibility{
 	border: 1px solid grey;

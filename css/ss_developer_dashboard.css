@@ -3,7 +3,10 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 	padding: 1em;
 }
 .cms div#SSDD-log-area {
-	height: 80%;
+	/* TODO: Use relative height.
+	 * The tabs influence up relative height calculations, this is a work around.
+	 */
+	height: 30em;
 	overflow-y: auto;
 }
 #SSDD-log-area .request p {
@@ -32,13 +35,4 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 }
 #SSDD-toggle-update.off .ssdd-progress-bar {
 	display: none;
-}
-div.toggle-stream-visibility {
-	float: left;
-}
-.toggle-stream-visibility{
-	border: 1px solid grey;
-} 
-.toggle-stream-visibility.on {
-	border-color: green;
 }

@@ -18,26 +18,24 @@
 <div class="tab-content">
   <div class="tab-pane active" id="SSDD-tabs-log">
     <div id="SSDD-toggle-update" class="off">
-      Update <span class="ss-ui-button">off</span>
+      Update <span class="btn">Off</span>
       <div class="ssdd-progress-bar">&nbsp;</div>
     </div>
+    <div class="btn-toolbar">
     <% loop $GetStreams %>
-      <div class="btn-group toggle-stream-visibility on">
-        <button class="btn">$StreamID</button>
-        <button class="btn dropdown-toggle" data-toggle="dropdown">
+      <div class="btn-group set-stream-visibility" id="set-stream-visibility-$StreamID">
+        <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">$StreamID
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li>Enable</li>
-          <li>Hide</li>
-          <li>Disable</li>
+          <li class="ssdd-stream-show">Show</li>
+          <li class="ssdd-stream-hide">Hide</li>
+          <li class="ssdd-stream-disable">Disable</li>
         </ul>
       </div>
     <% end_loop %>
+    </div>
     <br style="clear: left;"/>
-    <% loop $GetStreams %>
-      <span class="toggle-stream-visibility on" id="toggle-stream-visibility-$StreamID">$StreamID</span>
-    <% end_loop %>
     <div id="SSDD-log-area">
       <% include DeveloperDashboardLogCore %>
     </div>

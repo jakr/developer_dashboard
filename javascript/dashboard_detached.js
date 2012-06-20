@@ -24,7 +24,7 @@ function developerDashboardGetNewData() {
 		var jqData = jQuery(data);
 		//Hide new messages that belong to a stream that has been hidden.
 		jqData.children('p').each(function() {
-			if(!jQuery('#toggle-stream-visibility-'+this.className).hasClass('on')){
+			if(!jQuery('#set-stream-visibility-'+this.className).children().first().hasClass('btn-success')){
 				jQuery(this).addClass('hide');
 			}
 		});
@@ -44,34 +44,25 @@ function showStream(streamID){
 	jQuery('#SSDD-log-area .' + streamID).removeClass('hide');
 }
 
-//click on the "toggle update" button, enables or disables updates via AJAX .
+//click on the "toggle update" button, enables or disables updates via AJAX.
 jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
 	function() {
 		updateIntervalId = window.setInterval(
 				"developerDashboardGetNewData()", SSDD_refreshRate);
-		jQuery(this).removeClass().addClass('on').children().first().
-			text('on').addClass('ss-ui-action-constructive');
 		jQuery('#SSDD-toggle-update .ssdd-progress-bar').animate({width: '4em'}, 10)
 			.animate({width: '0'}, SSDD_refreshRate);
+		jQuery(this).removeClass('off').children('.btn').addClass('btn-success').text('On');
 	},
 	function() {
 		window.clearInterval(updateIntervalId);
 		updateIntervalId = null
-		jQuery(this).removeClass().addClass('off').children().first()
-			.text('off').removeClass('ss-ui-action-constructive');
+		console.log(jQuery(this).children('.btn'));
 		jQuery('#SSDD-toggle-update .ssdd-progress-bar').stop().css('width', '4em');
+		jQuery(this).addClass('off').children('.btn').removeClass('btn-success').text('Off');
 	}
 )});
 //turn on updates
 jQuery(function(){jQuery('#SSDD-toggle-update').click();});
-
-//display or hide a log stream
-jQuery(function() {
-	jQuery('.toggle-stream-visibility').click(function(){
-		jQuery('#SSDD-log-area .' + this.innerHTML).toggleClass('hide');
-		jQuery(this).toggleClass('on');
-	})
-});
 
 //tabs using bootstrap
 jQuery(function() {
@@ -81,9 +72,29 @@ jQuery(function() {
 		jQuery(this).tab('show');
 	});
 });
+
+//wire up enable and hide stream buttons.
 jQuery(function(){
-	//wire up enable and hide buttons.
-	//jQuery('.btn-group.toggle-stream-visibility')
-	// 	.dropdown-menu li
-	//});
+	jQuery('.btn-group.set-stream-visibility').each(function(index){
+		var streamId = jQuery(this).children().first().text();
+		jQuery(this).children('.dropdown-menu').children().each(function(index){
+			var jqt = jQuery(this); 
+			if(jqt.hasClass('ssdd-stream-show')){
+				jqt.click(function(){ //click on show stream
+					showStream(streamId);
+					jqt.parent().prev().addClass('btn-success');
+				});
+			} else if(jqt.hasClass('ssdd-stream-hide')){
+				jqt.click(function(){ //click on hide stream
+					hideStream(streamId);
+					jqt.parent().prev().removeClass('btn-success');
+				});
+			} else if(jqt.hasClass('ssdd-stream-disable')){
+				jqt.click(function(){ //click on disable stream
+					alert("Not implemented");
+				});
+			}
+			
+		})
+	});
 });

@@ -1,9 +1,10 @@
 <?php
 class DeveloperDashboard extends Controller {
 	private static $tabs = array();
+	private static $form = null;
 	
-	public static function addTab($tab){
-		self::$tabs[$tab->tabID] = $tab;
+	public static function add_panel($panel){
+		self::$form->add_panel($panel);
 	}
 	
 	public function init(){
@@ -17,8 +18,15 @@ class DeveloperDashboard extends Controller {
 		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard.css');
 		
-		$urlvarTab = new DashboardTab('URL Variable Tools', 'urlvariabletools');
-		self::addTab($urlvarTab);
+		if(self::$form == null){
+			self::$form = new DashboardForm($this, 'DashboardForm', 
+				new FieldList(new TabSet("Root")), 
+				new FieldList(new TabSet("Root"))
+			);
+		}
+		
+		self::add_log_panel();
+		self::add_urlvariable_panel();
 	}
 	
 	public function GetLoggedData(){
@@ -45,6 +53,10 @@ class DeveloperDashboard extends Controller {
 		return count(self::$tabs) >= 1;
 	}
 	
+	public function DashboardForm(){
+		return self::$form;
+	}
+	
 	/**
 	 * This is an action controller that returns the newest log messages.
 	 * It gets called via AJAX.
@@ -62,5 +74,26 @@ class DeveloperDashboard extends Controller {
 	 */
 	public function GetStreams(){
 		return DashboardLogWriter::get_stream_ids();
+	}
+	
+	private function add_log_panel(){
+		$fieldList = new FieldList();
+		$fieldList->add(new AutomaticRefreshButton('getlog', 'Update'));
+		foreach(DashboardLogWriter::get_stream_ids() as $stream){
+			$fieldList->add(new DashboardStreamControlButton(
+				$stream->StreamID,
+				$stream->StreamID
+			));
+		}
+		
+		self::add_panel(new DashboardPanel('Logs', $fieldList));
+	}
+	
+	private function add_urlvariable_panel(){
+		self::add_panel(new DashboardPanel('Tools', 
+			new FieldList(
+				new TextField("test")
+			)
+		));
 	}
 }

@@ -8,8 +8,10 @@ class DashboardPanel {
 	private $panelName;
 	private $fields;
 	
-	public function __construct($panelName, $fields){
-		if(!($fields instanceof FieldList)){
+	public function __construct($panelName, $fields = null){
+		if($fields == null) {
+			$fields = new FieldList();
+		} else if(!($fields instanceof FieldList)){
 			throw new InvalidArgumentException('$fields must be a FieldList');
 		}
 		$this->panelName = $panelName;
@@ -22,5 +24,12 @@ class DashboardPanel {
 	
 	public function GetName(){
 		return $this->panelName;
+	}
+	
+	public function addFormField($formField){
+		if(!($formField instanceof FormField)){
+			throw new InvalidArgumentException('$formField must be a FormField');
+		}
+		$this->fields->add($formField);
 	}
 }

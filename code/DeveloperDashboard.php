@@ -88,7 +88,9 @@ class DeveloperDashboard extends Controller {
 		$buttons->addExtraClass('btn-toolbar');
 		$panel = new DashboardPanel('Logs');
 		$panel->addFormField($buttons);
-		$logarea = new TextareaField('SSDD-log-area');
+                $logContents = $this->renderWith('DeveloperDashboardLogAjax');
+		$logarea = new CompositeField(new LiteralField('internalName', $logContents));
+                $logarea->addExtraClass('SSDD-log-area');
 		$panel->addFormField($logarea->performReadonlyTransformation());
 		
 		self::add_panel($panel);
@@ -97,7 +99,8 @@ class DeveloperDashboard extends Controller {
 	private function add_urlvariable_panel(){
 		$panel = new DashboardPanel('Tools');
 		$panel->addFormField(new DropdownField('site-mode', 'Mode', 
-			array('dev' => 'Development', 'test' => 'Test', '' => 'Live')));
+			array('dev' => 'Development', 'test' => 'Test', '' => 'Live')
+                ));
 		$panel->addFormField(new DropdownField(
 			'clear-cache', 
 			'Flush template cache', 
@@ -107,12 +110,16 @@ class DeveloperDashboard extends Controller {
 				'one' => 'Templates used on this page'
 			)
 		));
-		$panel->addFormField(new FormAction('showtemplate', 'Show Template'));
+		$panel->addFormField(new FormAction('showtemplate', 
+                        'Show Template'));
 		$panel->addFormField(new FormAction('debug', 
-			'Show debugging information about Director and Controller'));
+			'Show Director and Controller debugging information.'));
 		$panel->addFormField(new FormAction('debug_request',
-			'Show debugging information about the current Request.'));
-		$panel->addFormField(new FormAction('showtemplate', 'Show Template'));
+			'Show debugging information about the current Request.'
+                ));
+		$panel->addFormField(new FormAction(
+                        'showtemplate', 'Show Template'
+                ));
 		
 		/* TODO: add rest of urlvariabletools:
 		 * dev/build

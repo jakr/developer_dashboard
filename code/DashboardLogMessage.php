@@ -18,4 +18,9 @@ class DashboardLogMessage extends ViewableData {
 	public function __toString(){
 		return "[{$this->StreamID}] {$this->Timestamp} {$this->Message}";
 	}
+        
+        public function toXML(){
+            return (string)$this;
+            //return '<p class="">'.(string)$this.'</p>';
+        }
 }

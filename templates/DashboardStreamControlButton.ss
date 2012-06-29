@@ -1,4 +1,4 @@
-<div class="btn-group set-stream-visibility" id="$Title">
+<div class="btn-group set-stream-visibility" id="set-stream-visibility-{$Title}">
   <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">$Title
     <span class="caret"></span>
   </button>

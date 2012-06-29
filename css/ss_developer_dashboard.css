@@ -2,14 +2,14 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 	margin: 1em;
 	padding: 1em;
 }
-.cms div#SSDD-log-area {
+.cms div.SSDD-log-area {
 	/* TODO: Use relative height.
 	 * The tabs influence up relative height calculations, this is a work around.
 	 */
 	height: 30em;
 	overflow-y: auto;
 }
-#SSDD-log-area .request p {
+.SSDD-log-area .request p {
 	margin-bottom: 0;
 }
 #SSDD-toggle-update .ss-ui-button {

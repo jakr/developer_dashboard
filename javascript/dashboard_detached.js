@@ -6,11 +6,11 @@ var updateIntervalId = null;
  */
 function developerDashboardGetNewData() {
 	var newestLogEntry = 0;
-	var lastEntry = jQuery("#SSDD-log-area .request").last().get(0);
+	var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
 	if(typeof lastEntry != 'undefined') {
 		newestLogEntry = lastEntry.className.split(' ')[1];
 	}
-	jQuery("#SSDD-log-area .request").each(function() {
+	jQuery(".SSDD-log-area .request").each(function() {
 		var requestId = this.className.split(' ')[1];
 		if(requestId > newestLogEntry){
 			newestLogEntry = requestId; 
@@ -28,7 +28,7 @@ function developerDashboardGetNewData() {
 				jQuery(this).addClass('hide');
 			}
 		});
-		jQuery("#SSDD-log-area").append(jqData);
+		jQuery(".SSDD-log-area").append(jqData);
 		//The animation runs a little faster
 		// to make sure the animation is finished before the next refresh.
 		jQuery('#SSDD-toggle-update .ssdd-progress-bar').animate({width: '4em'}, 10)
@@ -37,11 +37,11 @@ function developerDashboardGetNewData() {
 }
 
 function hideStream(streamID){
-	jQuery('#SSDD-log-area .' + streamID).addClass('hide');
+	jQuery('.SSDD-log-area .' + streamID).addClass('hide');
 }
 
 function showStream(streamID){
-	jQuery('#SSDD-log-area .' + streamID).removeClass('hide');
+	jQuery('.SSDD-log-area .' + streamID).removeClass('hide');
 }
 
 //click on the "toggle update" button, enables or disables updates via AJAX.

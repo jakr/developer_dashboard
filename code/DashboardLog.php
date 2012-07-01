@@ -17,17 +17,16 @@ class DashboardLog {
 	/** @var Zend_Log_Writer_Stream The writer used to write to the log file. */
 	private static $log_file_writer = null;
 	
-	public static function init() {
-		if(self::$log_file_writer != null) {
-			return;
-		}
-		self::$log_file_writer = new Zend_Log_Writer_Stream(
-			self::get_log_file_path()
-		); 
-	}
+	private static $instance = null;
 	
 	public static function get_log_wrapper($streamID) {
 		if(!isset(self::$logWrappers[$streamID])) {
+			
+			if(self::$log_file_writer == null) {
+				self::$log_file_writer = new Zend_Log_Writer_Stream(
+					self::get_log_file_path()
+				);
+			}
 			$logWrap = new DashboardLogWrapper();
 			$writer = DashboardLogWriter::get_log_writer($streamID);
 			$logWrap->logger->addWriter($writer); 
@@ -37,6 +36,10 @@ class DashboardLog {
 			self::$logWrappers[$streamID] = $logWrap;
 		}
 		return self::$logWrappers[$streamID];
+	}
+	
+	public static function inst($streamID = 'DEFAULT') {
+		return self::get_log_wrapper($streamID);
 	}
 	
 	/**
@@ -73,7 +76,7 @@ class DashboardLog {
 	 *  'last' is the offset of the last line
 	 *  'text' is an array of lines.
 	 */
-	public static function read_log_file($offset=-1) {
+	public function read_log_file($offset=-1) {
 		$lines = array();
 		if($offset < 0) $offset = 0;
 		$file = fopen(self::get_log_file_path());
@@ -86,6 +89,4 @@ class DashboardLog {
 		fclose($file);
 		return array('last' => $posEOF, 'text' => $lines);	
 	}
-	
 }
-DashboardLog::init();

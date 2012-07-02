@@ -7,13 +7,18 @@
 class DashboardPanel {
 	private $panelName;
 	private $fields;
+	private $actions;
 	
-	public function __construct($panelName, $fields = null){
+	public function __construct($panelName, $fields = null, $actions = null){
 		if($fields == null) {
 			$fields = new FieldList();
 		} else if(!($fields instanceof FieldList)){
 			throw new InvalidArgumentException('$fields must be a FieldList');
 		}
+		if($actions == null){
+			$actions = array();
+		}
+		//TODO: Check that number of actions matches number of fields. 
 		$this->panelName = $panelName;
 		$this->fields = $fields;
 	}
@@ -22,11 +27,12 @@ class DashboardPanel {
 		return $this->fields;
 	}
 	
-	public function GetName(){
+	public function getName(){
 		return $this->panelName;
 	}
 	
-	public function addFormField($formField){
+	public function addFormField($formField, $callback = null){
+		//TODO store callback
 		if(!($formField instanceof FormField)){
 			throw new InvalidArgumentException('$formField must be a FormField');
 		}

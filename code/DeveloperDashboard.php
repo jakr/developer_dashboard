@@ -1,32 +1,35 @@
 <?php
 class DeveloperDashboard extends Controller {
-	//All instances share the same form.
-	private static $form = null;
+	private static $instance = null;
+	private $form = null;
 	
 	/**
 	 * Get an instance. 
 	 */
 	public static function inst(){
-		$instance = new DeveloperDashboard();
-		$instance->form = self::get_form();
-		return $instance;
-	}
-	
-	private static function get_form(){
-		if(self::$form == null){
-			self::$form = new DashboardForm($this, 'DashboardForm', 
-				new FieldList(new TabSet("Root")), 
-				new FieldList(new TabSet("Root"))
-			);
+		if(self::$instance == null){
+			$instance = new DeveloperDashboard();
+			$instance->init(); // this will set self::$instance
 		}
-		return self::$form;
+		return self::$instance;
 	}
 	
 	public function init(){
-		if(self::$instance == null){
-			self::$instance = $this;
-		}
 		parent::init();
+		
+		if(self::$instance == null){
+			$this->form = new DashboardForm($this, 'DashboardForm', 
+				new FieldList(new TabSet("Root")), 
+				new FieldList(new TabSet("Root"))
+			);
+			//TODO: Move panel setup code somewhere else.
+			$this->add_log_panel();
+			$this->add_urlvariable_panel();
+			self::$instance = $this;
+		} else {
+			$this->form = self::$instance->form;
+		}
+		
 		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
 		Requirements::javascript('developer_dashboard/thirdparty/bootstrap/js/bootstrap.min.js');
@@ -36,16 +39,12 @@ class DeveloperDashboard extends Controller {
 		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard.css');
 		
-		$this->form = self::get_form();
-		
-		$this->add_log_panel();
-		$this->add_urlvariable_panel();
 	}
 	
 	public function GetLoggedData(){
 		$param = $this->request->latestParam('ID');
 		$newerThan = $param === null ? 0 : $param;
-		return DashboardLogWriter::get_messages_from_session($newerThan);
+		return DashboardLogSessionStorage::inst()->getMessagesFromSession($newerThan);
 	}
 	
 	/**

@@ -16,8 +16,12 @@ class DashboardForm extends Form {
 		//@TODO: Preserve tab hierarchy.
 		//@TODO: Remap controller
 		foreach($panelFields as $formField){
-			$this->fields->addFieldToTab('Root.'.$panel->GetName(), $formField);
+			$this->fields->addFieldToTab('Root.'.$panel->getName(), $formField);
 		}
+	}
+	
+	public function findField($panelName, $fieldName){
+		return $this->fields->fieldByName("Root.$panelName.$fieldName");
 	}
 	
 }

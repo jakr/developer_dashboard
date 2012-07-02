@@ -24,14 +24,15 @@ class DeveloperDashboardTest extends SapphireTest {
 		$panel->addFormField($field, null);
 		$this->dashboard->addPanel($panel);
 		
-		$foundField = null; 
-		if($this->form == null){
+		$foundField = null;
+		if($this->form != null){
 			$foundField = $this->form->findField($panel->getName(), $field->getName());
+			$this->assertEquals($field->getName(), $foundField->getName());
 		} else {
-			
+			//Form not initialized
+			//TODO: test if panel has been added to the preliminary list.
+			echo "Warning: Form not initialized.";
 		}
-		$this->assertNotNull($foundField);
-		$this->assertEquals($field->getName(), $foundField->getName());
 	}
 	
 	public function testAddAction(){
@@ -82,6 +83,8 @@ class DeveloperDashboardTest extends SapphireTest {
 		$this->assertEquals(2, count($secondToLast->items));
 	}
 	
+	//TODO check if this can be replaced with a builtin function
+	// A good candidate would be assertDOSContains.
 	private function assertMessageListContains($expected, $messageList){
 		$found = array();
 		$notfound = array();

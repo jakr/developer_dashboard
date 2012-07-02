@@ -146,7 +146,8 @@ class DeveloperDashboard extends Controller {
 		 * showqueries, previewwrite
 		 * debug_memory, debug_profile, profile_trace
 		 * debug_behaviour, debug_javascript
-		 */ 
+		 */
+        // TODO: Make use of callbacks.
 		$this->addPanel($panel);
 	}
 }

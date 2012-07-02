@@ -1,4 +1,11 @@
 <?php
+/*
+ * TODO this class contains a mix of two different concerns
+ *  and a large number of static methods. Refactor needed.
+ * The first concern is the management of a single stream, which is done 
+ *  by the instances of this class. The second one is storing and loading data
+ *  from and to the session for all streams. This is done by the static methods. 
+ */
 require_once 'Zend/Log.php';
 require_once 'Zend/Log/Writer/Abstract.php';
 class DashboardLogWriter extends Zend_Log_Writer_Abstract {

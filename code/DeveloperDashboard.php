@@ -1,13 +1,31 @@
 <?php
 class DeveloperDashboard extends Controller {
-	private static $tabs = array();
+	//All instances share the same form.
 	private static $form = null;
 	
-	public static function add_panel($panel){
-		self::$form->add_panel($panel);
+	/**
+	 * Get an instance. 
+	 */
+	public static function inst(){
+		$instance = new DeveloperDashboard();
+		$instance->form = self::get_form();
+		return $instance;
+	}
+	
+	private static function get_form(){
+		if(self::$form == null){
+			self::$form = new DashboardForm($this, 'DashboardForm', 
+				new FieldList(new TabSet("Root")), 
+				new FieldList(new TabSet("Root"))
+			);
+		}
+		return self::$form;
 	}
 	
 	public function init(){
+		if(self::$instance == null){
+			self::$instance = $this;
+		}
 		parent::init();
 		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
@@ -18,43 +36,16 @@ class DeveloperDashboard extends Controller {
 		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard.css');
 		
-		if(self::$form == null){
-			self::$form = new DashboardForm($this, 'DashboardForm', 
-				new FieldList(new TabSet("Root")), 
-				new FieldList(new TabSet("Root"))
-			);
-		}
+		$this->form = self::get_form();
 		
-		self::add_log_panel();
-		self::add_urlvariable_panel();
+		$this->add_log_panel();
+		$this->add_urlvariable_panel();
 	}
 	
 	public function GetLoggedData(){
 		$param = $this->request->latestParam('ID');
 		$newerThan = $param === null ? 0 : $param;
 		return DashboardLogWriter::get_messages_from_session($newerThan);
-	}
-	
-	//@TODO @Mark: There is possibly a smarter way to do this. 
-	public function Tabs(){
-		$ret = new ArrayList();
-		foreach(self::$tabs as $tab){
-			$ret->push(new ArrayData(array(
-				'Title'=> $tab->Title,
-				'ID'=> $tab->ID,
-				'Content'=> $tab->getContent()
-			)));
-		}
-		return $ret;
-	}
-	
-	public function HasMultipleTabs(){
-		//At the moment, the log tab is hardcoded.
-		return count(self::$tabs) >= 1;
-	}
-	
-	public function DashboardForm(){
-		return self::$form;
 	}
 	
 	/**
@@ -64,6 +55,14 @@ class DeveloperDashboard extends Controller {
 	 */
 	public function getlog(){
 		return $this->renderWith('DeveloperDashboardLogAjax');
+	}
+	
+	public function add_panel($panel){
+		$this->form->add_panel($panel);
+	}
+	
+	public function DashboardForm(){
+		return $this->form;
 	}
 	
 	/**
@@ -93,7 +92,7 @@ class DeveloperDashboard extends Controller {
                 $logarea->addExtraClass('SSDD-log-area');
 		$panel->addFormField($logarea->performReadonlyTransformation());
 		
-		self::add_panel($panel);
+		$this->add_panel($panel);
 	}
 	
 	private function add_urlvariable_panel(){
@@ -129,6 +128,6 @@ class DeveloperDashboard extends Controller {
 		 * debug_memory, debug_profile, profile_trace
 		 * debug_behaviour, debug_javascript
 		 */ 
-		self::add_panel($panel);
+		$this->add_panel($panel);
 	}
 }

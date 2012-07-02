@@ -7,7 +7,7 @@ class DashboardForm extends Form {
 		parent::__construct($controller, $name, $fields, $actions, $validator);
 	}
 	
-	public function add_panel($panel){
+	public function addPanel($panel){
 		if(!($panel instanceof DashboardPanel)){
 			throw new InvalidArgumentException('$panel must be a DashboardPanel');
 		}

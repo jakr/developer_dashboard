@@ -25,7 +25,7 @@ class DashboardLogWrapper {
 		$this->filter->set_enabled($enabled);
 	}
 	
-	public function log($message, $priority, $extras=null){
+	public function log($message, $priority = Zend_Log::INFO, $extras=null){
 		$this->logger->log($message, $priority, $extras);
 	}
 	

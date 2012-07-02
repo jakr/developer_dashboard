@@ -2,14 +2,22 @@
 class DeveloperDashboard extends Controller {
 	private static $instance = null;
 	private $form = null;
+	/** @var panels that are added before form is instanciated. 
+	 * TODO: This is probably a very bad design, since any errors that might occur 
+	 * will be delayed until the fields are actually added to the form.
+	 * Need to look for a different way that will give immediate feedback. */
+	private $storedPanels = array();
 	
 	/**
 	 * Get an instance. 
 	 */
 	public static function inst(){
 		if(self::$instance == null){
-			$instance = new DeveloperDashboard();
-			$instance->init(); // this will set self::$instance
+			self::$instance = new DeveloperDashboard();
+			/*self::$instance->form = new DashboardForm(self::$instance, 'DashboardForm', 
+				new FieldList(new TabSet("Root")), 
+				new FieldList(new TabSet("Root"))
+			);*/
 		}
 		return self::$instance;
 	}
@@ -17,18 +25,12 @@ class DeveloperDashboard extends Controller {
 	public function init(){
 		parent::init();
 		
-		if(self::$instance == null){
-			$this->form = new DashboardForm($this, 'DashboardForm', 
-				new FieldList(new TabSet("Root")), 
-				new FieldList(new TabSet("Root"))
-			);
-			//TODO: Move panel setup code somewhere else.
-			$this->add_log_panel();
-			$this->add_urlvariable_panel();
-			self::$instance = $this;
-		} else {
-			$this->form = self::$instance->form;
-		}
+		$this->form = new DashboardForm($this, 'DashboardForm', 
+			new FieldList(new TabSet("Root")), 
+			new FieldList(new TabSet("Root"))
+		);
+		$this->addDefaultPanels();
+		$this->addStoredPanels();
 		
 		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
@@ -56,8 +58,21 @@ class DeveloperDashboard extends Controller {
 		return $this->renderWith('DeveloperDashboardLogAjax');
 	}
 	
-	public function add_panel($panel){
-		$this->form->add_panel($panel);
+	public function addPanel($panel){
+		if($this->form){
+			$this->form->addPanel($panel);
+		} else {
+			$this->storedPanels[] = $panel;
+		}
+	}
+	private function addStoredPanels(){
+		if(!$this->form){
+			throw new UnexpectedValueException("This method should only be called after init.");
+		}
+		foreach($this->storedPanels as $panel){
+			$this->addPanel($panel);
+		}
+		
 	}
 	
 	public function DashboardForm(){
@@ -72,6 +87,11 @@ class DeveloperDashboard extends Controller {
 	 */
 	public function GetStreams(){
 		return DashboardLogWriter::get_stream_ids();
+	}
+	
+	public function addDefaultPanels(){
+		$this->add_log_panel();
+		$this->add_urlvariable_panel();
 	}
 	
 	private function add_log_panel(){
@@ -91,7 +111,7 @@ class DeveloperDashboard extends Controller {
                 $logarea->addExtraClass('SSDD-log-area');
 		$panel->addFormField($logarea->performReadonlyTransformation());
 		
-		$this->add_panel($panel);
+		$this->addPanel($panel);
 	}
 	
 	private function add_urlvariable_panel(){
@@ -127,6 +147,6 @@ class DeveloperDashboard extends Controller {
 		 * debug_memory, debug_profile, profile_trace
 		 * debug_behaviour, debug_javascript
 		 */ 
-		$this->add_panel($panel);
+		$this->addPanel($panel);
 	}
 }

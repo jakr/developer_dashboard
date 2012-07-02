@@ -19,7 +19,7 @@ class DashboardLog {
 	
 	private static $instance = null;
 	
-	public static function get_log_wrapper($streamID) {
+	public static function get_log_wrapper($streamID = 'DEFAULT') {
 		if(!isset(self::$logWrappers[$streamID])) {
 			
 			if(self::$log_file_writer == null) {

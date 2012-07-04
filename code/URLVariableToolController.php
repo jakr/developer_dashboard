@@ -1,11 +1,15 @@
 <?php
 class URLVariableToolController extends Controller {
-	public function __construct(){
-		parent::__construct();
-		$this->add_urlvariable_panel();
+	public static function add_urlvariable_panel(){
+		$uvtc = new URLVariableToolController();
+		$uvtc->addUrlvariablePanel();
 	}
 	
-	private function add_urlvariable_panel(){
+	public function showtemplate(){
+		echo "Called";
+	}
+	
+	private function addUrlvariablePanel(){
 		$panel = new DashboardPanel('Tools');
 		$panel->addFormField(new DropdownField('site-mode', 'Mode', 
 			array('dev' => 'Development', 'test' => 'Test', '' => 'Live')
@@ -19,16 +23,14 @@ class URLVariableToolController extends Controller {
 				'one' => 'Templates used on this page'
 			)
 		));
-		$panel->addFormField(new FormAction('showtemplate', 
-                        'Show Template'));
+		$panel->addFormField(new FormAction(
+                        'showtemplate', 'Show Template'
+                ), $this);
 		$panel->addFormField(new FormAction('debug', 
 			'Show Director and Controller debugging information.'));
 		$panel->addFormField(new FormAction('debug_request',
 			'Show debugging information about the current Request.'
                 ));
-		$panel->addFormField(new FormAction(
-                        'showtemplate', 'Show Template'
-                ), $this);
 		
 		/* TODO: add rest of urlvariabletools:
 		 * dev/build
@@ -40,10 +42,7 @@ class URLVariableToolController extends Controller {
 		 */
         // TODO: Make use of callbacks.
 		DeveloperDashboard::inst()->addPanel($panel);
-	}
-	
-	public function showtemplate(){
-		echo "Called";
+		
 	}
 	
 }

@@ -1,14 +1,8 @@
 <?php
 class DashboardLogController extends Controller {
-	public function __construct(){
-		parent::__construct();
-		$this->add_log_panel();
-	}
-	
-	private function add_log_panel(){
-		$panel = new DashboardPanel('Logs');
-		$panel->setFormContentCallback($this);
-		DeveloperDashboard::inst()->addPanel($panel);
+	public static function add_log_panel(){
+		$dlc = new DashboardLogController();
+		$dlc->addLogPanel();
 	}
 	
 	/**
@@ -31,6 +25,12 @@ class DashboardLogController extends Controller {
 		$logarea = new CompositeField(new LiteralField('internalName', $logContents));
                 $logarea->addExtraClass('SSDD-log-area');
 		$panel->addFormField($logarea->performReadonlyTransformation());		
+	}
+	
+	private function addLogPanel(){
+		$panel = new DashboardPanel('Logs');
+		$panel->setFormContentCallback($this);
+		DeveloperDashboard::inst()->addPanel($panel);
 	}
 	
 }

@@ -83,38 +83,30 @@ class DeveloperDashboardTest extends SapphireTest {
 		$this->assertEquals(2, count($secondToLast->items));
 	}
 	
-	//TODO check if this can be replaced with a builtin function
-	// A good candidate would be assertDOSContains.
+	/*
+	 * Check if a Message list contains the messages in $expected.
+	 * 
+	 * This function internally calls assertDOSContains. This is possible
+	 *  because DashboardLogMessage pretends to be a DataObject
+	 *  by implementing toMap().
+	 *  
+	 * @param mixed A single message string or an array of message strings
+	 * @param messageList the list of requests that each contain a list of messages.
+	 * @return void. Will fail the test if the message is not found.  
+	 */
 	private function assertMessageListContains($expected, $messageList){
-		$found = array();
-		$notfound = array();
-		$failure = false;
+		$matches = array();
 		
 		if(is_array($expected)){
 			foreach($expected as $entry){
-				$found[$entry] = false;
+				$matches[] = array('Message' => $entry);
 			}
 		} else {
-			$found[$expected] = false;
+			$matches[] = array('Message' => $expected);
 		}
-		
-		foreach($messageList->toArray() as $messageListEntry){
-			foreach($messageListEntry->Children as $child){
-				if(isset($found[$child->Message])){
-					$found[$child->Message] = true;
-				}
-			}
-		}
-		
-		foreach($found as $key=>$entry){
-			if($entry === false){
-				$failure .= $key.', ';
-			}
-		}
-		
-		if($failure){
-			$this->fail('Message list did not contain expected messages '.substr($failure, 0, -2));
-		}
+		$val = $messageList->items;
+		$this->assertTrue(count($val) >= 1);
+		$this->assertDOSContains($matches, array_pop($val)->Children);
 	}
 	
 }

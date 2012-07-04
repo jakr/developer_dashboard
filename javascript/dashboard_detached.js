@@ -62,7 +62,8 @@ jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
 	}
 )});
 //turn on updates
-jQuery(function(){jQuery('#SSDD-toggle-update').click();});
+//TODO Enable in final version. Disabled for tests.
+//jQuery(function(){jQuery('#SSDD-toggle-update').click();});
 
 //tabs using bootstrap
 jQuery(function() {

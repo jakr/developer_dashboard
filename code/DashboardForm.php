@@ -5,12 +5,13 @@ class DashboardForm extends Form {
 	
 	public function __construct($controller, $name, $fields, $actions, $validator = null) {
 		parent::__construct($controller, $name, $fields, $actions, $validator);
+		$controllerClassname = get_class($controller);
+		if(substr($this->FormAction(), 0, strlen($controllerClassname)) == $controllerClassname){
+			$this->setFormAction(Director::absoluteURL($this->FormAction()));
+		}
 	}
 	
-	public function addPanel($panel) {
-		if(!($panel instanceof DashboardPanel)){
-			throw new InvalidArgumentException('$panel must be a DashboardPanel');
-		}
+	public function addPanel(DashboardPanel $panel) {
 		//Get information from $panel and add it to our form
 		//@TODO: Preserve tab hierarchy.
 		$callbacks = $panel->Callbacks();
@@ -19,9 +20,9 @@ class DashboardForm extends Form {
 			if($formField instanceof FormAction){
 				$actionName = $formField->actionName();
 				if(isset($callbacks[$actionName])){
-					$this->callbacks[$formField->actionName()] = $callbacks[$actionName];
+					$this->callbacks[$actionName] = $callbacks[$actionName];
 				} else {
-					$this->callbacks[$formField->actionName()] = null;
+					$this->callbacks[$actionName] = null;
 				}
 			}
 			$this->fields->addFieldToTab('Root.'.$panel->getName(), $formField);
@@ -56,15 +57,16 @@ class DashboardForm extends Form {
 				break;
 			}
 		}
-		
 		//Check if a callback for this action exists and redirect the call.
 		if(isset($this->callbacks[$funcName])){
 			$callback = $this->callbacks[$funcName];
-			if($callback == null){
-				$this->controller->redirectBack();
-				return;
+			if($callback != null){
+				if(is_array($callback)){
+					return call_user_func($callback, $this, $request);
+				} else {
+					return $callback($vars, $this, $request);
+				}
 			}
-			return $callback($vars, $this, $request);
 		}
 		
 		return parent::httpSubmission($request);

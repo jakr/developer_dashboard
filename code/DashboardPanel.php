@@ -82,7 +82,10 @@ class DashboardPanel {
 	 * 
 	 * If $controller is set, it either has to contain a method with the
 	 *  same name as the FormField or methodName has to be set to a valid name.
-	 * The appropriate function is then called when the action is triggered.
+	 * This callback function is then called when the action is triggered 
+	 *  on the form. If the callback function returns content, 
+	 *  that content is displayed. Otherwise, the user is redirected back 
+	 *  to the original form.
 	 * 
 	 * Usage:
 	 * From a Controller:

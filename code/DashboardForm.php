@@ -61,10 +61,17 @@ class DashboardForm extends Form {
 		if(isset($this->callbacks[$funcName])){
 			$callback = $this->callbacks[$funcName];
 			if($callback != null){
+				$return = false;
 				if(is_array($callback)){
-					return call_user_func($callback, $this, $request);
+					$return = call_user_func($callback, $this, $request);
 				} else {
-					return $callback($vars, $this, $request);
+					$return = $callback($vars, $this, $request);
+				}
+				if($return === true || ($return != null && $return !== '')){
+					return $return;
+				} else {
+					$this->controller->redirect($this->controller->Link());
+					return;
 				}
 			}
 		}

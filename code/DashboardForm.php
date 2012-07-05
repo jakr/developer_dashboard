@@ -35,7 +35,8 @@ class DashboardForm extends Form {
 	
 	/**
 	 * Check if we have a callback for the action in this request and call that.
-	 * Otherwise we call the parent function
+	 * Otherwise we call the parent function.
+	 * @see DashboardPanel->addFormField
 	 */
 	public function httpSubmission($request) {
 		$vars = $request->requestVars();
@@ -63,16 +64,28 @@ class DashboardForm extends Form {
 			if($callback != null){
 				$return = false;
 				if(is_array($callback)){
-					$return = call_user_func($callback, $this, $request);
+					$return = call_user_func($callback, $funcName, $request, $this);
 				} else {
-					$return = $callback($vars, $this, $request);
+					throw new BadFunctionCallException(
+						'Cannot call the callback ' .print_r($callback,1));
 				}
-				if($return === true || ($return != null && $return !== '')){
+				
+				//Depending on the return value, we either 
+				// display the result of the function call,
+				// redirect to a different location
+				// or redirect back to the current location.
+				//If this logic is changed, the documentation in 
+				// DashboardPanel::addFormField needs to be updated!
+				if($return === null){
+					$this->controller->redirect($this->controller->Link());
+				} elseif(is_array($return) && isset($return['redirect'])){
+					$this->controller->redirect($return['redirect']);
+				} elseif($return === true || $return !== ''){
 					return $return;
 				} else {
 					$this->controller->redirect($this->controller->Link());
-					return;
 				}
+				return;
 			}
 		}
 		

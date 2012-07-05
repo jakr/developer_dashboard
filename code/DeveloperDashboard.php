@@ -83,4 +83,22 @@ class DeveloperDashboard extends Controller {
 	public function GetStreams(){
 		return DashboardLogWriter::get_stream_ids();
 	}
+	
+	/**
+	 * Get the URL that was visited last (see the php doc for HTTP_REFERER).
+	 * 
+	 * If the previous page cannot be determined or if it was this Controller,
+	 *  false is returned.
+	 * @return mixed string the URL or boolean false.
+	 */
+	public function getLastURL(){
+		//TODO we have to store the last valid referer, maybe in the session.
+		if(isset($_SERVER['HTTP_REFERER']) 
+			&& $_SERVER['HTTP_REFERER'] != Director::absoluteURL($this->Link())
+		){
+			return $_SERVER['HTTP_REFERER'];
+		} else {
+			return false;
+		}
+	}
 }

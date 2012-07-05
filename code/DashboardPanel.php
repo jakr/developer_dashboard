@@ -86,11 +86,24 @@ class DashboardPanel {
 	 *  on the form. If the callback function returns content, 
 	 *  that content is displayed. Otherwise, the user is redirected back 
 	 *  to the original form.
+	 * The callback function will receive three parameters:
+	 *   public function callback($actionName, $request, $form);
+	 *   The first parameter is the name of the action that was triggered.
+	 *   The second paramter is the current request.
+	 *   The third paramter is the current DashboardForm instance. 
+	 * 
+	 * Depending on the return value of the callback, a redirect will happen:
+	 *   * If nothing or null is returned, the form will be shown again.
+	 *   * If an array with (redirect => URL) is returned, URL will be shown.
+	 *   * If true is returned, no redirect will happen
+	 *   * If a string is returned, the string will be displayed without redirect 
+	 *   * In any other case, the form will be shown again.
 	 * 
 	 * Usage:
 	 * From a Controller:
 	 *   $panel->addFormField(new TextareaField(...));
 	 *   $panel->addFormField(new FormAction(...), $this);
+	 *   $panel->addFormField(new FormAction(...), $this, 'someMethod');
 	 * 
 	 * @param FormField $formField
 	 * @param Controller $controller

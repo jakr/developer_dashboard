@@ -1,10 +1,15 @@
 <?php 
 class DeveloperDashboardTest extends SapphireTest {
 	
+	/** @var DeveloperDashboard */
 	private $dashboard;
+	/** @var DashboardForm the form that is associated with the dashboard. */
 	private $form;
+	/** @var DashboardSessionStorage */
 	private $storage;
+	/** @var DashboardLogWrapper */
 	private $logWrapper;
+	/** @var array of string */
 	private $messages = array();
 
     public function setUp() {
@@ -31,7 +36,7 @@ class DeveloperDashboardTest extends SapphireTest {
 		} else {
 			//Form not initialized
 			//TODO: test if panel has been added to the preliminary list.
-			echo "Warning: Form not initialized.";
+			echo "Warning: Form not initialized. Could not test addPanel.<br />";
 		}
 	}
 	

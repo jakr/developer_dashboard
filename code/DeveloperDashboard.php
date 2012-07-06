@@ -92,13 +92,14 @@ class DeveloperDashboard extends Controller {
 	 * @return mixed string the URL or boolean false.
 	 */
 	public function getLastURL(){
-		//TODO we have to store the last valid referer, maybe in the session.
+		$storage = DashboardSessionStorage::inst();
 		if(isset($_SERVER['HTTP_REFERER']) 
 			&& $_SERVER['HTTP_REFERER'] != Director::absoluteURL($this->Link())
 		){
+			$storage->storeSetting('ORIGINAL_HTTP_REFERER', $_SERVER['HTTP_REFERER']);
 			return $_SERVER['HTTP_REFERER'];
 		} else {
-			return false;
+			return $storage->loadSetting('ORIGINAL_HTTP_REFERER');
 		}
 	}
 }

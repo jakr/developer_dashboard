@@ -6,9 +6,10 @@ class DashboardSessionStorage {
 	private static $instance = null;
 	/** @var int Number of requests that are stored in the session */
 	public static $requests_to_keep = 10;
-	private static $session_data_key = 'DEVELOPER_DASHBOARD_LOG_MESSAGES';
+	private static $session_key = 'DEVELOPER_DASHBOARD';
+	private static $log_message_key = 'LOG_MESSAGES';
 	
-	private $messages = array();
+	private $session_data = array();
 	private $request_number = -1;
 	
 	
@@ -25,25 +26,30 @@ class DashboardSessionStorage {
 			return;
 		}
 		Session::start();
-		$this->messages = Session::get(self::$session_data_key);
-		if($this->messages == null){
-			$this->messages = array();
+		$this->session_data = Session::get(self::$session_key);
+		if($this->session_data == null){
+			$this->session_data = array();
+			$this->session_data[self::$log_message_key] = array();
 			$this->request_number = 0;
 		} else {
-			$keys = array_keys($this->messages);
+			$keys = array_keys($this->session_data[self::$log_message_key]);
 			$this->request_number = end($keys) + 1;
 			//remove old requests.
 			$elements = count($keys) + 1;
 			if($elements + 1 > self::$requests_to_keep){
 				for($i=0; $i<$elements-self::$requests_to_keep; $i++){
-					unset($this->messages[$keys[$i]]);
+					unset($this->session_data[self::$log_message_key][$keys[$i]]);
 				}
 			}
 		}
 		//Append new array for messages written by this request.
-		$this->messages[$this->request_number] = array(); 
+		$this->session_data[self::$log_message_key][$this->request_number] = array(); 
 	}
 	
+	/**
+	 * Get an instance.
+	 * @return DashboardSessionStorage
+	 */
 	public static function inst(){
 		if(self::$instance == null){
 			self::$instance = new DashboardSessionStorage();
@@ -51,10 +57,22 @@ class DashboardSessionStorage {
 		return self::$instance;
 	}
 	
+	public function storeSetting($name, $value){
+		$this->session_data[$name] = $value;
+		$this->updateSession();
+	}
+	
+	public function loadSetting($name){
+		if(!isset($this->session_data[$name])){
+			return false;
+		} else {
+			return $this->session_data[$name];
+		}		
+	}
+	
 	public function storeMessageObject($messageObj) {
-		$this->messages[$this->request_number][] = $messageObj;
-		Session::set(self::$session_data_key, $this->messages);
-		Session::save();
+		$this->session_data[self::$log_message_key][$this->request_number][] = $messageObj;
+		$this->updateSession();
 	}
 
 	/**
@@ -64,9 +82,9 @@ class DashboardSessionStorage {
 	 *  to ensure that messages are output even if an error occured.
 	 * @return array the logged messages as strings, one message per entry. 
 	 */
-	public function get_log_file_messages() {
+	public function getLogFileMessages() {
 		$ret = array();
-		foreach($this->messages[$this->request_number] as $message){
+		foreach($this->session_data[self::$log_message_key][$this->request_number] as $message){
 			$ret[] = $message->__toString();
 		}
 		return $ret;
@@ -84,7 +102,7 @@ class DashboardSessionStorage {
 	 */
 	public function getMessagesFromSession($newerThan = 0) {
 		$requests = new ArrayList();
-		foreach($this->messages as $key=>$messages){
+		foreach($this->session_data[self::$log_message_key] as $key=>$messages){
 			//skip every request older than $newerThan
 			if($newerThan >= $key) continue;
 			$requests->push(new ArrayData(array(
@@ -93,5 +111,10 @@ class DashboardSessionStorage {
 			)));
 		}
 		return $requests;
+	}
+	
+	private function updateSession(){
+		Session::set(self::$session_key, $this->session_data);
+		Session::save();
 	}
 }

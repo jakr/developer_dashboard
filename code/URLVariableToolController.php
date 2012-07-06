@@ -41,9 +41,15 @@ class URLVariableToolController extends Controller {
 		}
 		if($siteMode != Director::get_environment_type()){
 			Director::set_environment_type($siteMode);
+			/*
+			 * TODO: Read out this setting at the beginning of the request
+			 *  and act accordingly (see next todo below).
+			 */
+			DashboardSessionStorage::inst()->storeSetting(
+				'REQUESTED_SITE_MODE', $siteMode);
 		}
 		/*
-		 * TODO implement storing and retreiving settings
+		 * TODO implement retreiving settings
 		 * This could be used to append an URL paramter to any request.
 		 */
 		return;
@@ -75,7 +81,6 @@ class URLVariableToolController extends Controller {
 	
 	private function addUrlvariablePanel() {
 		$panel = new DashboardPanel('Tools');
-		echo Director::get_environment_type();
 		
 		//Global settings
 		$panel->addFormField(new HeaderField('title-global-settings', 'Global Settings'));

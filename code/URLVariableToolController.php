@@ -5,37 +5,55 @@ class URLVariableToolController extends Controller {
 		'debug_request' => '1',
 		'showtemplate' => '1',
 		'build_classmanifest' => '/dev/build',
+		'flush_all' => array('flush', 'all'),
+		'flush_one' => array('flush', '1'),
+	);
+	private static $environment_types = array(
+		'live' => 'Live', 
+		'test' => 'Test', 
+		'dev' => 'Development'
 	);
 	
-	public static function add_urlvariable_panel(){
+	public static function add_urlvariable_panel() {
 		$uvtc = new URLVariableToolController();
 		$uvtc->addUrlvariablePanel();
 	}
 	
-	public function redirectHandler($actionName, $request, $form){
-		echo $actionName;
+	public function redirectHandler($actionName, $request, $form) {
 		if(!isset(self::$action_names[$actionName])){
 			return;
 		}
 		$val = self::$action_names[$actionName];
-		if(substr($val, 0, 1) == '/' ){
-			$target = Director::absoluteURL($val);
+		if(is_array($val) && count($val) == 2){
+			$target = $this->getLastURLWithParameter(implode('=', $val));
+		} elseif(substr($val, 0, 1) == '/' ){
+			$target = Director::baseURL() . substr($val, 1);
 		} else {
 			$target = $this->getLastURLWithParameter("$actionName=$val");
 		}
 		return array('redirect' => $target);
 	}
 	
-	public function savesettings(){
+	public function savesettings($action, SS_HTTPRequest $request) {
+		$siteMode = $request->requestVar('site-mode');
+		if(!isset(self::$environment_types[$siteMode])){
+			return 'Invalid environment type';
+		}
+		if($siteMode != Director::get_environment_type()){
+			Director::set_environment_type($siteMode);
+		}
 		/*
 		 * TODO implement storing and retreiving settings
-		 * This could be used to set the site into dev mode,
-		 *  or to append an URL paramter to any request.
+		 * This could be used to append an URL paramter to any request.
 		 */
-		return 'Not implemented yet';
+		return;
 	}
 	
-	private function getLastURL(){
+	public function flush_all($actionName, SS_HTTPRequest $request, $form) {
+		return array('redirect' => $form->getController()->Link().'?flush=all');
+	}
+	
+	private function getLastURL() {
 		$lastURL = DeveloperDashboard::inst()->getLastURL();
 		if($lastURL === false){
 			$lastURL = Director::baseURL();
@@ -47,7 +65,7 @@ class URLVariableToolController extends Controller {
 	 * Append a get parameter (foo=bar) to $this->lastURL
 	 * @param string $parameter
 	 */
-	private function getLastURLWithParameter($parameter){
+	private function getLastURLWithParameter($parameter) {
 	
 		$lastURL = $this->getLastURL();
 		return $lastURL
@@ -55,40 +73,40 @@ class URLVariableToolController extends Controller {
 			.$parameter;
 	}
 	
-	private function addUrlvariablePanel(){
+	private function addUrlvariablePanel() {
 		$panel = new DashboardPanel('Tools');
+		echo Director::get_environment_type();
 		
 		//Global settings
-		$panel->addFormField(new HeaderField('title-global', 'Global Settings'));
+		$panel->addFormField(new HeaderField('title-global-settings', 'Global Settings'));
 		$panel->addFormField(new DropdownField('site-mode', 'Mode', 
-			array('dev' => 'Development', 'test' => 'Test', '' => 'Live')
-                ));
-		$panel->addFormField(new DropdownField(
-			'clear-cache', 
-			'Flush template cache', 
-			array(
-				'' => '', 
-				'all' => 'Complete cache', 
-				'one' => 'Templates used on this page'
-			)
-		));
+			self::$environment_types, Director::get_environment_type()));
 		$panel->addFormField(
 			new FormAction('savesettings','Save Settings'),
 			$this
 		);
+		
+		//Global actions
+		$panel->addFormField(new HeaderField('title-global-actions', 'Global Actions'));
+		$panel->addFormField(
+			new FormAction('flush_all', 'Flush template cache for all pages'),
+			$this);
 		$panel->addFormField(
 			new FormAction('build_classmanifest','Rebuild class manifest (dev/build)'),
 			$this, 'redirectHandler'
 		);
 		
-		//Only affecting "current" site
-		$panel->addFormField(new HeaderField('title-pagelevel', 'Page-level Settings'));
+		//Page level actions - only affect the "current" site
+		$panel->addFormField(new HeaderField('title-pagelevel-actions', 'Page-Level Actions'));
 		
 		$panel->addFormField(
 			new LabelField('Page affected', 
 				'The follwoing commands will affect the page ' 
 				. "{$this->getLastURL()}. <br />\n")
 		);
+		$panel->addFormField(
+			new FormAction('flush_one', 'Flush template cache for this page'),
+			$this, 'redirectHandler');
 		$panel->addFormField(
 			new FormAction('showtemplate', 'Show Template'),
 			$this, 'redirectHandler'
@@ -110,7 +128,6 @@ class URLVariableToolController extends Controller {
 		 * debug_memory, debug_profile, profile_trace
 		 * debug_behaviour, debug_javascript
 		 */
-        // TODO: Make use of callbacks.
 		DeveloperDashboard::inst()->addPanel($panel);
 		
 	}

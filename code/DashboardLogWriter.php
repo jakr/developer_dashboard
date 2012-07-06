@@ -53,7 +53,7 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	
 	private function __construct($streamID) {
 		$this->streamID = $streamID;
-		$this->storage = DashboardLogSessionStorage::inst();
+		$this->storage = DashboardSessionStorage::inst();
 	}
 
 	public function _write($event) {

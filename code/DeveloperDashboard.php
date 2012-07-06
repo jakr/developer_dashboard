@@ -40,7 +40,7 @@ class DeveloperDashboard extends Controller {
 	public function GetLoggedData(){
 		$param = $this->request->latestParam('ID');
 		$newerThan = $param === null ? 0 : $param;
-		return DashboardLogSessionStorage::inst()->getMessagesFromSession($newerThan);
+		return DashboardSessionStorage::inst()->getMessagesFromSession($newerThan);
 	}
 	
 	/**

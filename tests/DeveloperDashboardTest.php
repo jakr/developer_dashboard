@@ -11,7 +11,7 @@ class DeveloperDashboardTest extends SapphireTest {
     	parent::setUp();
     	$this->dashboard = DeveloperDashboard::inst();
     	$this->form = $this->dashboard->DashboardForm();
-    	$this->storage = DashboardLogSessionStorage::inst();
+    	$this->storage = DashboardSessionStorage::inst();
     	$this->logWrapper = DashboardLog::get_log_wrapper('TestStream');
     	for($i=0; $i<10; $i++){
     		$this->messages[] = "Message $i";

@@ -2,7 +2,7 @@
 /**
  * Singleton class.
  */
-class DashboardLogSessionStorage {
+class DashboardSessionStorage {
 	private static $instance = null;
 	/** @var int Number of requests that are stored in the session */
 	public static $requests_to_keep = 10;
@@ -46,7 +46,7 @@ class DashboardLogSessionStorage {
 	
 	public static function inst(){
 		if(self::$instance == null){
-			self::$instance = new DashboardLogSessionStorage();
+			self::$instance = new DashboardSessionStorage();
 		}
 		return self::$instance;
 	}

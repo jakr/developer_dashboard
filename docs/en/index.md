@@ -8,14 +8,14 @@ By default (when no custom tabs have been added), it will display two tabs:
   * Tools, showing debug functionality, and
   * Logs, showing log information that was written using DashboardLogWriter.
 
-![A screen shot of the Tools Tab](/jakr/developer_dashboard/docs/img/tab_tools.png "The Tools tab")
+![A screen shot of the Tools Tab](/jakr/developer_dashboard/raw/master/docs/img/tab_tools.png "The Tools tab")
 
-![A screen shot of the Logs Tab, showing different streams](/jakr/developer_dashboard/docs/img/tab_logs_refresh.png "The logs tab")
+![A screen shot of the Logs Tab, showing different streams](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_refresh.png "The logs tab")
 
 Each stream has a control button. Clicking on the button, it is possible to hide information from a stream:
-![The stream control menu](/jakr/developer_dashboard/docs/img/tab_logs_stream_menu.png "The stream control menu")
+![The stream control menu](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_stream_menu.png "The stream control menu")
 
-![A screen shot of the Logs Tab, with one stream hidden](/jakr/developer_dashboard/docs/img/tab_logs_hide_stream_default.png "After hiding the DEFAULT stream, it is no longer shown.")
+![A screen shot of the Logs Tab, with one stream hidden](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_hide_stream_default.png "After hiding the DEFAULT stream, it is no longer shown.")
 
 ## Usage ##
 Please note that the Dashboard is at an early stage of development and that the API still changes frequently.

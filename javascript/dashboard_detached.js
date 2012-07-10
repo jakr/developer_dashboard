@@ -16,7 +16,10 @@ function developerDashboardGetNewData() {
 			newestLogEntry = requestId; 
 		}
 	});
-	var url = window.location.pathname + 'getlog/' + newestLogEntry;
+	var url = window.location.pathname;
+	//append slash (if missing).
+	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 
+		+ '/getlog/' + newestLogEntry;
 	//flash the off/on button to indicate that it is active.
 	jQuery('#SSDD-toggle-update').children().first().css('opacity', 0.5)
 		.animate({opacity: 1}, 1000);

@@ -1,0 +1,1 @@
+<div class="btn" id="{$Id}">$Title</div>

@@ -72,6 +72,20 @@ jQuery(function(){jQuery('#ARB-Update').toggle(
 		stopUpdate('Update');
 	}
 )});
+
+//Show / Hide Timestamps
+jQuery(function(){
+	jQuery('#toggle_display_timestamp').toggle(
+		function() {
+			jQuery('.Timestamp').addClass('hide');
+		},
+		function() {
+			jQuery('.Timestamp').removeClass('hide');
+		}
+	);
+	jQuery('#toggle_display_timestamp').click();
+});
+
 //turn on updates
 //TODO Enable in final version. Disabled for tests.
 //jQuery(function(){jQuery('#SSDD-toggle-update').click();});

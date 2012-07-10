@@ -12,6 +12,7 @@ class DashboardLogController extends Controller {
 	public function getPanelContent(DashboardPanel $panel){
 		$buttons = new CompositeField();
 		$buttons->push(new AutomaticRefreshButton('getlog', 'Update'));
+		$buttons->push(new JSOnlyButton('toggle_display_timestamp', 'Toggle Timestamps'));
 		foreach(DashboardLogWriter::get_stream_ids() as $stream){
 			$buttons->push(new DashboardStreamControlButton(
 				$stream->StreamID,

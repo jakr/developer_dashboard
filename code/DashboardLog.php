@@ -19,7 +19,15 @@ class DashboardLog {
 	
 	private static $instance = null;
 	
+	
+	/**
+	 * Get an instance of the log wrapper for the given streamID.
+	 * 
+	 * @param string $streamID
+	 * @return DashboardLogWrapper
+	 */
 	public static function get_log_wrapper($streamID = 'DEFAULT') {
+		$streamID = str_replace(' ', '-', $streamID); //remove spaces.
 		if(!isset(self::$logWrappers[$streamID])) {
 			
 			if(self::$log_file_writer == null) {
@@ -38,6 +46,12 @@ class DashboardLog {
 		return self::$logWrappers[$streamID];
 	}
 	
+	/**
+	 * Get an instance of the log wrapper for the given streamID.
+	 * 
+	 * @param string $streamID
+	 * @return DashboardLogWrapper
+	 */
 	public static function inst($streamID = 'DEFAULT') {
 		return self::get_log_wrapper($streamID);
 	}
@@ -47,7 +61,7 @@ class DashboardLog {
 	 * 
 	 * @param string $message 
 	 * @param string $streamID
-	 * @param int $timestamp
+	 * @param int $priority
 	 */
 	public static function log($message, $streamID = 'DEFAULT',
 			$priority = Zend_Log::INFO) {

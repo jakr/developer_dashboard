@@ -12,27 +12,16 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 .SSDD-log-area .request p {
 	margin-bottom: 0;
 }
-#SSDD-toggle-update .ss-ui-button {
-	margin-left: 1em;
-	padding: 1em;
-	width: 2em;
-	text-align: center;
+.automatic-refresh-button {
+	margin-bottom: 1em;
 }
-#SSDD-toggle-update.on .ss-ui-button {
-	background-color: green;
-	color: white;
-}
-#SSDD-toggle-update.off .ss-ui-button {
-	background-color: grey;
-	color: black;
-}
-#SSDD-toggle-update .ssdd-progress-bar {
+.automatic-refresh-button .ssdd-progress-bar {
 	margin-left: 1em;
 	display: inline-block;
 	background-color: blue;
 	width: 4em;
 	opacity: 0.75;
 }
-#SSDD-toggle-update.off .ssdd-progress-bar {
+.automatic-refresh-button.off .ssdd-progress-bar {
 	display: none;
 }

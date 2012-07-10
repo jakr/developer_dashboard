@@ -1,5 +1,7 @@
-<div id="ARB-{$Title}" class="off">
+<div id="ARB-{$Title}" class="automatic-refresh-button off">
 <% if ButtonContent %>$ButtonContent<% else %>$Title<% end_if %>
+<div $AttributesHTML>Off</div>
+<noscript>
 <% if UseButtonTag %>
 	<button $AttributesHTML>
 		Off
@@ -7,11 +9,6 @@
 <% else %>
 	<input $AttributesHTML>
 <% end_if %>
-<div class="ssdd-progress-bar-{$Title}">&nbsp;</div>
+</noscript>
+<div class="ssdd-progress-bar" id="ssdd-progress-bar-{$Title}">&nbsp;</div>
 </div>
-AutomaticRefreshButton.ss still contains the old button code - remove when done with update!<br/>
-<div id="SSDD-toggle-update" class="off">
-      Update <span class="btn">Off</span>
-      <div class="ssdd-progress-bar">&nbsp;</div>
-    </div>
-      

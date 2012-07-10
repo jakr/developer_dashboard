@@ -4,7 +4,7 @@ var updateIntervalId = null;
 /**
  * Run an AJAX request to get new log messages from the server.
  */
-function developerDashboardGetNewData() {
+function developerDashboardGetNewData(buttonID, refreshRate) {
 	var newestLogEntry = 0;
 	var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
 	if(typeof lastEntry != 'undefined') {
@@ -19,10 +19,10 @@ function developerDashboardGetNewData() {
 	var url = window.location.pathname;
 	//append slash (if missing).
 	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 
-		+ '/getlog/' + newestLogEntry;
+		+ 'getlog/' + newestLogEntry;
 	//flash the off/on button to indicate that it is active.
-	jQuery('#SSDD-toggle-update').children().first().css('opacity', 0.5)
-		.animate({opacity: 1}, 1000);
+	jQuery('#ARB-' + buttonID).children().first().css('opacity', 0.5)
+		.animate({opacity: 1}, 500);
 	jQuery.get(url, function (data) {
 		var jqData = jQuery(data);
 		//Hide new messages that belong to a stream that has been hidden.
@@ -32,11 +32,27 @@ function developerDashboardGetNewData() {
 			}
 		});
 		jQuery(".SSDD-log-area").append(jqData);
-		//The animation runs a little faster
-		// to make sure the animation is finished before the next refresh.
-		jQuery('#SSDD-toggle-update .ssdd-progress-bar').animate({width: '4em'}, 10)
-			.animate({width: '0'}, SSDD_refreshRate*0.95);
 	});
+	startUpdate(buttonID, refreshRate);
+}
+
+function startUpdate(buttonID, refreshRate){
+	var button = jQuery('#ARB-' + buttonID);
+	if(button.hasClass('off')){
+		button.removeClass('off').children('.btn').addClass('btn-success').text('On');
+	}
+	jQuery('#ssdd-progress-bar-' + buttonID).animate({width: '4em'}, 10)
+	.animate({width: '0'}, {
+			duration: refreshRate, 
+			complete: function(){developerDashboardGetNewData(buttonID, refreshRate);}
+		}
+	);
+}
+
+function stopUpdate(buttonID){
+	jQuery('#ssdd-progress-bar-' + buttonID).stop().css('width', '4em');
+	jQuery('#ARB-' + buttonID).addClass('off').children('.btn').removeClass('btn-success').text('Off');
+	
 }
 
 function hideStream(streamID){
@@ -48,34 +64,18 @@ function showStream(streamID){
 }
 
 //click on the "toggle update" button, enables or disables updates via AJAX.
-jQuery(function(){jQuery('#SSDD-toggle-update').toggle(
+jQuery(function(){jQuery('#ARB-Update').toggle(
 	function() {
-		updateIntervalId = window.setInterval(
-				"developerDashboardGetNewData()", SSDD_refreshRate);
-		jQuery('#SSDD-toggle-update .ssdd-progress-bar').animate({width: '4em'}, 10)
-			.animate({width: '0'}, SSDD_refreshRate);
-		jQuery(this).removeClass('off').children('.btn').addClass('btn-success').text('On');
+		startUpdate('Update', 5000);
 	},
 	function() {
-		window.clearInterval(updateIntervalId);
-		updateIntervalId = null
-		console.log(jQuery(this).children('.btn'));
-		jQuery('#SSDD-toggle-update .ssdd-progress-bar').stop().css('width', '4em');
-		jQuery(this).addClass('off').children('.btn').removeClass('btn-success').text('Off');
+		stopUpdate('Update');
 	}
 )});
 //turn on updates
 //TODO Enable in final version. Disabled for tests.
 //jQuery(function(){jQuery('#SSDD-toggle-update').click();});
 
-//tabs using bootstrap
-jQuery(function() {
-	if(jQuery('#SSDD-tabs').length == 0) { return; }
-	jQuery('#SSDD-tabs a').click(function (e) {
-		e.preventDefault();
-		jQuery(this).tab('show');
-	});
-});
 
 //wire up enable and hide stream buttons.
 jQuery(function(){

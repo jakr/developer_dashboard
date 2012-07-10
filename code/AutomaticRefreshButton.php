@@ -5,6 +5,7 @@ class AutomaticRefreshButton extends FormAction {
 	}
 	
 	public function Field($properties=array()){
+		$this->addExtraClass('btn');
 		$innerData = parent::Field($properties);
 		$fieldData = $innerData;
 		return $fieldData;

@@ -13,4 +13,5 @@ if(Member::currentUserID()){
 	DashboardLog::log('No user logged in.', 'User');
 }
 DashboardLog::log('Hello World from Dashboard');
-DashboardLog::log('A Message in a different stream', 'SomeOtherStream');
+SS_Log::add_writer(DashboardLogWriter::get_log_writer('SS_Log'));
+SS_Log::get_logger()->log('Hello World from SS_Log', SS_Log::NOTICE);

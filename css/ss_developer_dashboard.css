@@ -25,3 +25,15 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 .automatic-refresh-button.off .ssdd-progress-bar {
 	display: none;
 }
+.SSDD-log-area {
+	background-color: white;
+}
+.SSDD-log-area .streamID {
+	color: #444444;
+}
+.SSDD-log-area .Timestamp {
+	color: #444444;
+}
+.SSDD-log-area .Message {
+	color: black;
+}

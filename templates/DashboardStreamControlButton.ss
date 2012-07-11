@@ -5,6 +5,6 @@
   <ul class="dropdown-menu">
     <li class="ssdd-stream-show">Show</li>
     <li class="ssdd-stream-hide">Hide</li>
-    <li class="ssdd-stream-disable">Disable</li>
+    <li class="ssdd-stream-hide-others">Hide all other streams</li>
   </ul>
 </div>

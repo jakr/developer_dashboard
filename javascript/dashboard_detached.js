@@ -5,8 +5,9 @@ var updateIntervalId = null;
  * Run an AJAX request to get new log messages from the server.
  */
 function developerDashboardGetNewData(buttonID, refreshRate) {
-	var newestLogEntry = 0;
+	var timestampHidden = jQuery('.Timestamp').first().hasClass('hide');
 	var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
+	var newestLogEntry = 0;
 	if(typeof lastEntry != 'undefined') {
 		newestLogEntry = lastEntry.className.split(' ')[1];
 	}
@@ -20,15 +21,19 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 	//append slash (if missing).
 	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 
 		+ 'getlog/' + newestLogEntry;
+
 	//flash the off/on button to indicate that it is active.
 	jQuery('#ARB-' + buttonID).children().first().css('opacity', 0.5)
 		.animate({opacity: 1}, 500);
+
 	jQuery.get(url, function (data) {
 		var jqData = jQuery(data);
 		//Hide new messages that belong to a stream that has been hidden.
 		jqData.children('p').each(function() {
-			if(!jQuery('#set-stream-visibility-'+this.className).children().first().hasClass('btn-success')){
-				jQuery(this).addClass('hide');
+			var visible = jQuery('#set-stream-visibility-'+this.className +' .btn')
+				.hasClass('btn-success'); 
+			if(timestampHidden){
+				jQuery(this).children('.Timestamp').addClass('hide');
 			}
 		});
 		jQuery(".SSDD-log-area").append(jqData);
@@ -51,16 +56,29 @@ function startUpdate(buttonID, refreshRate){
 
 function stopUpdate(buttonID){
 	jQuery('#ssdd-progress-bar-' + buttonID).stop().css('width', '4em');
-	jQuery('#ARB-' + buttonID).addClass('off').children('.btn').removeClass('btn-success').text('Off');
+	jQuery('#ARB-' + buttonID).addClass('off').children('.btn')
+		.removeClass('btn-success').text('Off');
 	
 }
 
 function hideStream(streamID){
 	jQuery('.SSDD-log-area .' + streamID).addClass('hide');
+	var buttonSelector = '#set-stream-visibility-' + streamID + ' .btn'; 
+	jQuery(buttonSelector).removeClass('btn-success');
 }
 
 function showStream(streamID){
 	jQuery('.SSDD-log-area .' + streamID).removeClass('hide');
+	var buttonSelector = '#set-stream-visibility-' + streamID + ' .btn'; 
+	jQuery(buttonSelector).addClass('btn-success');
+}
+
+function hideOtherStreams(showStreamID){
+	console.log(showStreamID);
+	jQuery('.set-stream-visibility').each(function(){
+		hideStream(jQuery(this).children().first().text());
+	})
+	showStream(showStreamID);
 }
 
 //click on the "toggle update" button, enables or disables updates via AJAX.
@@ -73,7 +91,8 @@ jQuery(function(){jQuery('#ARB-Update').toggle(
 	}
 )});
 
-//Show / Hide Timestamps
+//Show / Hide Timestamps. Could be done using toggleClass,
+// but this way it will fix elements that have the wrong state. 
 jQuery(function(){
 	jQuery('#toggle_display_timestamp').toggle(
 		function() {
@@ -95,24 +114,16 @@ jQuery(function(){
 jQuery(function(){
 	jQuery('.btn-group.set-stream-visibility').each(function(index){
 		var streamId = jQuery(this).children().first().text();
-		jQuery(this).children('.dropdown-menu').children().each(function(index){
-			var jqt = jQuery(this); 
-			if(jqt.hasClass('ssdd-stream-show')){
-				jqt.click(function(){ //click on show stream
-					showStream(streamId);
-					jqt.parent().prev().addClass('btn-success');
-				});
-			} else if(jqt.hasClass('ssdd-stream-hide')){
-				jqt.click(function(){ //click on hide stream
-					hideStream(streamId);
-					jqt.parent().prev().removeClass('btn-success');
-				});
-			} else if(jqt.hasClass('ssdd-stream-disable')){
-				jqt.click(function(){ //click on disable stream
-					alert("Not implemented");
-				});
-			}
-			
-		})
+		var menu = jQuery(this).children('.dropdown-menu');
+		
+		menu.children('.ssdd-stream-show').click(function(){
+			showStream(streamId);
+		});
+		menu.children('.ssdd-stream-hide').click(function(){
+			hideStream(streamId);
+		});
+		menu.children('.ssdd-stream-hide-others').click(function(){
+			hideOtherStreams(streamId);
+		});
 	});
 });

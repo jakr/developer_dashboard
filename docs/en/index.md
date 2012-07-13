@@ -15,7 +15,7 @@ By default (when no custom tabs have been added), it will display two tabs:
 Each stream has a control button. Clicking on the button, it is possible to hide information from a stream:
 ![The stream control menu](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_stream_menu.png "The stream control menu")
 
-![A screen shot of the Logs Tab, with one stream hidden](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_hide_stream_default.png "After hiding the DEFAULT stream, it is no longer shown.")
+![A screen shot of the Logs Tab, with only one stream shown](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_hide_stream.png "After clicking on SS_LOG and choosing hide all other streams, only the SS_LOG stream is shown.")
 
 ## Usage ##
 Please note that the Dashboard is at an early stage of development and that the API still changes frequently.
@@ -35,7 +35,5 @@ If the controller that you are in has a method of the same name as the FormActio
 In some cases, the information you want to display is not available during initialization. This might happen if you try to access Session or the database. For this case, you can register a callback using `setFormContentCallback($controller)`. Before the form is displayed, `$controller->getPanelContent($panel)` will be executed, allowing to add more fields to the panel using `$panel->addFormField()`. It is also possible to access the existing fields using `$panel->Fields()`.
 
 ### Logging ###
-To log to the dashboard, get a DashboardLogWrapper by calling DashboardLog::get_log_wrapper. Logging is done by calling log(). If you have more advanced needs, you can directly access the Zend_Log instance using $logger.
-
-If your log information is expensive to generate, call is_enabled() first to find out if the log stream is enabled.
+See [Logging](logging.md).
 

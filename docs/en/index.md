@@ -13,6 +13,7 @@ By default (when no custom tabs have been added), it will display two tabs:
 ![A screen shot of the Logs Tab, showing different streams](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_refresh.png "The logs tab")
 
 Each stream has a control button. Clicking on the button, it is possible to hide information from a stream:
+
 ![The stream control menu](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_stream_menu.png "The stream control menu")
 
 ![A screen shot of the Logs Tab, with only one stream shown](/jakr/developer_dashboard/raw/master/docs/img/tab_logs_hide_stream.png "After clicking on SS_LOG and choosing hide all other streams, only the SS_LOG stream is shown.")

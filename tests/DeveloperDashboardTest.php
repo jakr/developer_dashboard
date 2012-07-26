@@ -11,6 +11,11 @@ class DeveloperDashboardTest extends SapphireTest {
 	private $logWrapper;
 	/** @var array of string */
 	private $messages = array();
+	
+	/** @var string the path to the test logfile. Deleted after every run. */
+	private $testFilePath = '../logfile_test.txt';
+	/** @var resource the handle to the test logfile.*/
+	private $testFile = null;
 
     public function setUp() {
     	parent::setUp();
@@ -22,6 +27,12 @@ class DeveloperDashboardTest extends SapphireTest {
     		$this->messages[] = "Message $i";
     	}
     }
+	
+	public function tearDown(){
+		if($this->testFile != null) fclose($this->testFile);
+		if(is_file($this->testFilePath)) unlink($this->testFilePath);
+		parent::tearDown();
+	}
 	
 	public function testAddPanel() {
 		$panel = new DashboardPanel('TestPanel');
@@ -88,6 +99,27 @@ class DeveloperDashboardTest extends SapphireTest {
 		$this->assertEquals(2, count($secondToLast->items));
 	}
 	
+	public function testReadLogFile(){
+		//Write
+		$this->writeToTestFile($this->messages[0]."\n");
+		DashboardLog::register_log_file('TEST', $this->testFilePath);
+		//read
+		$res = DashboardLog::read_log_file(-1, 'TEST');
+		$offset = $res['last'];
+		$this->assertEquals($this->messages[0]."\n", $res['text'][0]);
+		
+		
+		//write
+		$this->writeToTestFile($this->messages[1]."\n");
+		//read all
+		$res = DashboardLog::read_log_file(-1, 'TEST');
+		$this->assertEquals($this->messages[0]."\n", $res['text'][0]);
+		$this->assertEquals($this->messages[1]."\n", $res['text'][1]);
+		//read only new
+		$res = DashboardLog::read_log_file($offset, 'TEST');
+		$this->assertEquals($this->messages[1]."\n", $res['text'][0]);
+	}
+	
 	/*
 	 * Check if a Message list contains the messages in $expected.
 	 * 
@@ -112,6 +144,10 @@ class DeveloperDashboardTest extends SapphireTest {
 		$val = $messageList->items;
 		$this->assertTrue(count($val) >= 1);
 		$this->assertDOSContains($matches, array_pop($val)->Children);
+	}
+	
+	private function writeToTestFile($message){
+		file_put_contents($this->testFilePath, $message, FILE_APPEND);
 	}
 	
 }

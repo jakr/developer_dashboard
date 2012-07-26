@@ -19,6 +19,8 @@ class DashboardLog {
 	
 	private static $instance = null;
 	
+	private static $available_log_files = array();
+	
 	
 	/**
 	 * Get an instance of the log wrapper for the given streamID.
@@ -68,6 +70,13 @@ class DashboardLog {
 		$wrapper = self::get_log_wrapper($streamID);
 		$wrapper->log($message, $priority);
 	}
+	
+	public static function register_log_file($name, $path){
+		if(!is_file($path)){
+			throw new InvalidArgumentException("Invalid path: $path");
+		}
+		self::$available_log_files[$name] = $path;
+	}
     
 	/**
 	 * Figure out where our log files are stored.
@@ -90,14 +99,23 @@ class DashboardLog {
 	 *  'last' is the offset of the last line
 	 *  'text' is an array of lines.
 	 */
-	public function read_log_file($offset=-1) {
+	public static function read_log_file($offset=-1, $logFileName = 'DEFAULT') {
+		if(!isset(self::$available_log_files[$logFileName])){
+			if($logFileName == 'DEFAULT'){
+				self::$available_log_files[$logFileName] = self::get_log_file_path();
+			} else {
+				return 'Unknown log file';
+			}
+		}
+		
+		$path = self::$available_log_files[$logFileName];
 		$lines = array();
 		if($offset < 0) $offset = 0;
-		$file = fopen(self::get_log_file_path());
+		$file = fopen($path, 'r');
 		fseek($file, 0, SEEK_END);
 		$posEOF = ftell($file);
 		fseek($file, $offset);
-		while($line = fgets($file) !== false){
+		while($line = fgets($file)){
 			$lines[] = $line;
 		}
 		fclose($file);

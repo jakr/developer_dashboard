@@ -32,6 +32,7 @@ class DeveloperDashboard extends Controller {
 		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
 		Requirements::javascript('developer_dashboard/thirdparty/bootstrap/js/bootstrap.min.js');
+		//@TODO: Rename JS file and move next line to DashboardLogController->init.
 		Requirements::javascript('developer_dashboard/javascript/dashboard_detached.js');
 		//Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery-ui/jquery-ui.min.js');
 		Requirements::css(THIRDPARTY_DIR.'/jquery-ui-themes/smoothness/jquery-ui.css');

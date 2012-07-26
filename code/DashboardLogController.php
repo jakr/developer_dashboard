@@ -48,7 +48,7 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 	
 	private function addLogPanel(){
 		$panel = new DashboardPanel('Logs');
-		$panel->setFormContentCallback($this);
+		$panel->setContentProvider($this);
 		$panel->forwardAction('getlog', $this);
 		DeveloperDashboard::inst()->addPanel($panel);
 	}

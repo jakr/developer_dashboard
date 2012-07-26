@@ -9,9 +9,9 @@ class DashboardPanel {
 	private $panelName;
 	/** @var FieldList the fields of this panel */
 	private $fields;
-	/** @var Controller an optional controller instance that 
+	/** @var DashboardPanelContentProvider an optional content provider that 
 	 * will be called to update the form fields before the form is displayed. */
-	private $formContentCallbackController = null;
+	private $formContentProvider = null;
 	/** @var array mixed entries. The callbacks. */
 	private $callbacks;
 	/** @var array mixed. The actions that should be forwarded. */
@@ -69,23 +69,23 @@ class DashboardPanel {
 	/**
 	 * Allows to update the panel's content before it is displayed.
 	 * 
-	 * The method getPanelContent is called on $controller before the form is displayed.
+	 * The method getPanelContent is called on $provider before the form is displayed.
 	 * This can be used to add content that was not available when this panel 
 	 *  was constructed, such as data from the session or the database.
-	 * @param Controller $controller
+	 * @param DashboardPanelContentProvider $provider
 	 */
-	public function setFormContentCallback(DashboardPanelContentProvider $controller){
-		$this->formContentCallbackController = $controller;
+	public function setContentProvider(DashboardPanelContentProvider $provider) {
+		$this->formContentProvider = $provider;
 	}
 	
 	/**
-	 * Updates the panel's content if setFormContentCallback was called.
+	 * Updates the panel's content if setContentProvider was called.
 	 */
 	public function updateContent(){
-		if($this->formContentCallbackController == null){
+		if($this->formContentProvider == null){
 			return;
 		}
-		$this->formContentCallbackController->getPanelContent($this);
+		$this->formContentProvider->getPanelContent($this);
 	}
 	
 	/**

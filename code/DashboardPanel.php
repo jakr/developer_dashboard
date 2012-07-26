@@ -14,6 +14,8 @@ class DashboardPanel {
 	private $formContentCallbackController = null;
 	/** @var array mixed entries. The callbacks. */
 	private $callbacks;
+	/** @var array mixed. The actions that should be forwarded. */
+	private $actions;
 	
 	public function __construct($panelName, FieldList $fields = null,
 		array $callbacks = null
@@ -26,6 +28,7 @@ class DashboardPanel {
 		} else {
 			$this->callbacks = $callbacks;
 		}
+		$this->actions = array();
 		//TODO: Check that number of actions matches number of fields. 
 		$this->panelName = $panelName;
 		$this->fields = $fields;
@@ -48,6 +51,14 @@ class DashboardPanel {
 	}
 	
 	/**
+	 * Get the callbacks
+	 * @return array an associative array fieldName => callback.
+	 */
+	public function Actions(){
+		return $this->actions;
+	}
+	
+	/**
 	 * Get the panel's name.
 	 * @return string
 	 */
@@ -63,7 +74,7 @@ class DashboardPanel {
 	 *  was constructed, such as data from the session or the database.
 	 * @param Controller $controller
 	 */
-	public function setFormContentCallback(Controller $controller){
+	public function setFormContentCallback(DashboardPanelContentProvider $controller){
 		$this->formContentCallbackController = $controller;
 	}
 	
@@ -138,5 +149,29 @@ class DashboardPanel {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Register an action on the DeveloperDashboard.
+	 * 
+	 * This allows to forward the action $action from the DeveloperDashboard to
+	 *  a different controller.
+	 * 
+	 * @param string $action the name of the action
+	 * @param Controller $controller
+	 * @param string $method optional, can be omitted if same as $action.
+	 * @throws InvalidArgumentException if $methodName is not a valid method on
+	 *   the $controller.
+	 */
+	public function forwardAction($action, Controller $controller, $method=''){
+		//@TODO: change this method to allow anonymous callback functions.
+		if($method == ''){
+			$method = $action;
+		}
+		if(!$controller->hasMethod($method)){
+			throw new InvalidArgumentException(
+					"Controller does not have a method called $method");
+		}
+		$this->actions[$action] = array($controller, $method);
 	}
 }

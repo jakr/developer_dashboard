@@ -1,9 +1,12 @@
 <?php
 class DeveloperDashboard extends Controller {
 	private static $instance = null;
+	/** @var DashboardForm the form */
 	private $form = null;
 	/** @var panels that are added before form is instanciated.*/
 	private static $storedPanels = array();
+	/** @var array the actions that should be forwarded.*/
+	private static $actions = array();
 	
 	/**
 	 * Get an instance. 
@@ -36,32 +39,32 @@ class DeveloperDashboard extends Controller {
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard.css');
 		
 	}
-	
-	public function GetLoggedData(){
-		$param = $this->request->latestParam('ID');
-		$newerThan = $param === null ? 0 : $param;
-		return DashboardSessionStorage::inst()->getMessagesFromSession($newerThan);
+
+	public function handleAction($request){
+		$action = $request->latestParam('Action');
+		if(isset(self::$actions[$action])){
+			$controller = self::$actions[$action][0];
+			$method = self::$actions[$action][1];
+			return $controller->$method($request);
+		} else {
+			return parent::handleAction($request);
+		}
 	}
 	
-	/**
-	 * This is an action controller that returns the newest log messages.
-	 * It gets called via AJAX.
-	 * 
-	 */
-	public function getlog(){
-		return $this->renderWith('DeveloperDashboardLogAjax');
-	}
-	
-	public function addPanel($panel){
+	public function addPanel(DashboardPanel $panel){
 		if($this->form){
 			$this->form->addPanel($panel);
 		} else {
 			self::$storedPanels[] = $panel;
 		}
+		foreach($panel->Actions() as $actionName => $callbackInfo){
+			self::$actions[$actionName] = $callbackInfo;
+		}
 	}
 	private function addStoredPanels(){
 		if(!$this->form){
-			throw new UnexpectedValueException("This method should only be called after init.");
+			throw new UnexpectedValueException(
+				"This method should only be called after init.");
 		}
 		foreach(self::$storedPanels as $panel){
 			$panel->updateContent();
@@ -96,7 +99,8 @@ class DeveloperDashboard extends Controller {
 		if(isset($_SERVER['HTTP_REFERER']) 
 			&& $_SERVER['HTTP_REFERER'] != Director::absoluteURL($this->Link())
 		){
-			$storage->storeSetting('ORIGINAL_HTTP_REFERER', $_SERVER['HTTP_REFERER']);
+			$storage->storeSetting(
+					'ORIGINAL_HTTP_REFERER', $_SERVER['HTTP_REFERER']);
 			return $_SERVER['HTTP_REFERER'];
 		} else {
 			return $storage->loadSetting('ORIGINAL_HTTP_REFERER');

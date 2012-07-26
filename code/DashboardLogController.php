@@ -1,8 +1,26 @@
 <?php
-class DashboardLogController extends Controller {
+class DashboardLogController extends Controller  implements DashboardPanelContentProvider {
 	public static function add_log_panel(){
 		$dlc = new DashboardLogController();
 		$dlc->addLogPanel();
+	}
+	
+	public function GetLoggedData(){
+		$param = $this->request->latestParam('ID');
+		$newerThan = $param === null ? 0 : $param;
+		return DashboardSessionStorage::inst()->getMessagesFromSession($newerThan);
+	}
+	
+	/**
+	 * This is an action controller that returns the newest log messages.
+	 * It gets called via AJAX.
+	 * 
+	 */
+	public function getlog($request = null){
+		if($request != null) {
+			$this->request = $request;
+		}
+		return $this->renderWith('DeveloperDashboardLogAjax');
 	}
 	
 	/**
@@ -21,7 +39,7 @@ class DashboardLogController extends Controller {
 		}
 		$buttons->addExtraClass('btn-toolbar');
 		$panel->addFormField($buttons);
-		$logContents = DeveloperDashboard::inst()->getlog();
+		$logContents = $this->getlog();
 		
 		$logarea = new CompositeField(new LiteralField('internalName', $logContents));
                 $logarea->addExtraClass('SSDD-log-area');
@@ -31,6 +49,7 @@ class DashboardLogController extends Controller {
 	private function addLogPanel(){
 		$panel = new DashboardPanel('Logs');
 		$panel->setFormContentCallback($this);
+		$panel->forwardAction('getlog', $this);
 		DeveloperDashboard::inst()->addPanel($panel);
 	}
 	

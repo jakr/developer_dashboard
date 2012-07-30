@@ -1,4 +1,4 @@
-<?php 
+<?php
 class DeveloperDashboardTest extends SapphireTest {
 	
 	/** @var DeveloperDashboard */

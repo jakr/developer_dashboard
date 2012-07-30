@@ -9,11 +9,13 @@ class DashboardPanel {
 	private $panelName;
 	/** @var FieldList the fields of this panel */
 	private $fields;
-	/** @var Controller an optional controller instance that 
+	/** @var DashboardPanelContentProvider an optional content provider that 
 	 * will be called to update the form fields before the form is displayed. */
-	private $formContentCallbackController = null;
+	private $formContentProvider = null;
 	/** @var array mixed entries. The callbacks. */
 	private $callbacks;
+	/** @var array mixed. The actions that should be forwarded. */
+	private $actions;
 	
 	public function __construct($panelName, FieldList $fields = null,
 		array $callbacks = null
@@ -26,6 +28,7 @@ class DashboardPanel {
 		} else {
 			$this->callbacks = $callbacks;
 		}
+		$this->actions = array();
 		//TODO: Check that number of actions matches number of fields. 
 		$this->panelName = $panelName;
 		$this->fields = $fields;
@@ -48,6 +51,14 @@ class DashboardPanel {
 	}
 	
 	/**
+	 * Get the callbacks
+	 * @return array an associative array fieldName => callback.
+	 */
+	public function Actions(){
+		return $this->actions;
+	}
+	
+	/**
 	 * Get the panel's name.
 	 * @return string
 	 */
@@ -58,23 +69,23 @@ class DashboardPanel {
 	/**
 	 * Allows to update the panel's content before it is displayed.
 	 * 
-	 * The method getPanelContent is called on $controller before the form is displayed.
+	 * The method getPanelContent is called on $provider before the form is displayed.
 	 * This can be used to add content that was not available when this panel 
 	 *  was constructed, such as data from the session or the database.
-	 * @param Controller $controller
+	 * @param DashboardPanelContentProvider $provider
 	 */
-	public function setFormContentCallback(Controller $controller){
-		$this->formContentCallbackController = $controller;
+	public function setContentProvider(DashboardPanelContentProvider $provider) {
+		$this->formContentProvider = $provider;
 	}
 	
 	/**
-	 * Updates the panel's content if setFormContentCallback was called.
+	 * Updates the panel's content if setContentProvider was called.
 	 */
 	public function updateContent(){
-		if($this->formContentCallbackController == null){
+		if($this->formContentProvider == null){
 			return;
 		}
-		$this->formContentCallbackController->getPanelContent($this);
+		$this->formContentProvider->getPanelContent($this);
 	}
 	
 	/**
@@ -138,5 +149,29 @@ class DashboardPanel {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Register an action on the DeveloperDashboard.
+	 * 
+	 * This allows to forward the action $action from the DeveloperDashboard to
+	 *  a different controller.
+	 * 
+	 * @param string $action the name of the action
+	 * @param Controller $controller
+	 * @param string $method optional, can be omitted if same as $action.
+	 * @throws InvalidArgumentException if $methodName is not a valid method on
+	 *   the $controller.
+	 */
+	public function forwardAction($action, Controller $controller, $method=''){
+		//@TODO: change this method to allow anonymous callback functions.
+		if($method == ''){
+			$method = $action;
+		}
+		if(!$controller->hasMethod($method)){
+			throw new InvalidArgumentException(
+					"Controller does not have a method called $method");
+		}
+		$this->actions[$action] = array($controller, $method);
 	}
 }

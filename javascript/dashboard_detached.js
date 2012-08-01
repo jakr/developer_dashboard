@@ -36,7 +36,8 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 				jQuery(this).children('.Timestamp').addClass('hide');
 			}
 		});
-		jQuery(".SSDD-log-area").append(jqData);
+		var area = jQuery('.SSDD-log-area').append(jqData);
+		area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
 	});
 	startUpdate(buttonID, refreshRate);
 }

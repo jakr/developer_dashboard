@@ -1,5 +1,6 @@
 <?php
 class DeveloperDashboard extends Controller {
+	
 	private static $instance = null;
 	/** @var DashboardForm the form */
 	private $form = null;
@@ -42,6 +43,11 @@ class DeveloperDashboard extends Controller {
 	}
 
 	public function handleAction($request){
+		//Setting $allowed_actions would not account for those added by others.
+		if(Permission::check('ADMIN') === false){
+			return __class__.' can only be used by Administrators.';
+		}
+		
 		$action = $request->latestParam('Action');
 		if(isset(self::$actions[$action])){
 			$controller = self::$actions[$action][0];
@@ -49,6 +55,16 @@ class DeveloperDashboard extends Controller {
 			return $controller->$method($request);
 		} else {
 			return parent::handleAction($request);
+		}
+	}
+	
+	public function __destruct(){
+		if(Director::get_environment_type() == 'dev' 
+			&& Permission::check('ADMIN') !== false
+			&& !Director::is_ajax()
+		){
+			echo '<div><a href="'.Director::absoluteURL($this->Link())
+					.'">Open Developer Dashboard</a></div>';
 		}
 	}
 	

@@ -44,6 +44,9 @@ class DeveloperDashboard extends Controller {
 
 	public function handleAction($request){
 		//Setting $allowed_actions would not account for those added by others.
+		if(Director::get_environment_type() != 'dev'){
+			return __class__.' can only be used in development mode by Administrators.';
+		}
 		if(Permission::check('ADMIN') === false){
 			return __class__.' can only be used by Administrators.';
 		}
@@ -60,8 +63,10 @@ class DeveloperDashboard extends Controller {
 	
 	public function __destruct(){
 		if(Director::get_environment_type() == 'dev' 
-			&& Permission::check('ADMIN') !== false
 			&& !Director::is_ajax()
+			// it is too late to use SapphireTest::is_running_test()
+			&& strstr($_SERVER['REQUEST_URI'], '/dev/tests/') === false
+			&& Permission::check('ADMIN') //Required DB connection missing during tests!
 		){
 			echo '<div><a href="'.Director::absoluteURL($this->Link())
 					.'">Open Developer Dashboard</a></div>';

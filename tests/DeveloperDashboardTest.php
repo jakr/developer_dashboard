@@ -17,16 +17,21 @@ class DeveloperDashboardTest extends SapphireTest {
 	/** @var resource the handle to the test logfile.*/
 	private $testFile = null;
 
-    public function setUp() {
-    	parent::setUp();
-    	$this->dashboard = DeveloperDashboard::inst();
-    	$this->form = $this->dashboard->DashboardForm();
-    	$this->storage = DashboardSessionStorage::inst();
-    	$this->logWrapper = DashboardLog::get_log_wrapper('TestStream');
-    	for($i=0; $i<10; $i++){
-    		$this->messages[] = "Message $i";
-    	}
-    }
+	public function setUp() {
+		parent::setUp();
+		//unfortunately, after using
+		//Controller::curr()->setSession(new Session(array()));
+		//Session will still save to $_SESSION.
+		//so in order to separate the stored data, we change the session key :
+		DashboardSessionStorage::$session_key .= '_TEST';
+		$this->dashboard = DeveloperDashboard::inst();
+		$this->form = $this->dashboard->DashboardForm();
+		$this->storage = DashboardSessionStorage::inst();
+		$this->logWrapper = DashboardLog::get_log_wrapper('TestStream');
+		for($i=0; $i<10; $i++){
+			$this->messages[] = "Message $i";
+		}
+	}
 	
 	public function tearDown(){
 		if($this->testFile != null) fclose($this->testFile);
@@ -45,14 +50,8 @@ class DeveloperDashboardTest extends SapphireTest {
 			$foundField = $this->form->findField($panel->getName(), $field->getName());
 			$this->assertEquals($field->getName(), $foundField->getName());
 		} else {
-			//Form not initialized
-			//TODO: test if panel has been added to the preliminary list.
-			echo "Warning: Form not initialized. Could not test addPanel.<br />";
+			//The form is not initialized, so this is only a smoke test.
 		}
-	}
-	
-	public function testAddAction(){
-		//$this->fail("Not implemented");
 	}
 	
 	public function testGetLogWrapper(){
@@ -104,20 +103,20 @@ class DeveloperDashboardTest extends SapphireTest {
 		$this->writeToTestFile($this->messages[0]."\n");
 		DashboardLog::register_log_file('TEST', $this->testFilePath);
 		//read
-		$res = DashboardLog::read_log_file(-1, 'TEST');
-		$offset = $res['last'];
-		$this->assertEquals($this->messages[0]."\n", $res['text'][0]);
+		$res1 = DashboardLog::read_log_file(-1, 'TEST');
+		$offset = $res1['last'];
+		$this->assertEquals($this->messages[0]."\n", $res1['text'][0]);
 		
 		
 		//write
 		$this->writeToTestFile($this->messages[1]."\n");
 		//read all
-		$res = DashboardLog::read_log_file(-1, 'TEST');
-		$this->assertEquals($this->messages[0]."\n", $res['text'][0]);
-		$this->assertEquals($this->messages[1]."\n", $res['text'][1]);
+		$res2 = DashboardLog::read_log_file(-1, 'TEST');
+		$this->assertEquals($this->messages[0]."\n", $res2['text'][0]);
+		$this->assertEquals($this->messages[1]."\n", $res2['text'][1]);
 		//read only new
-		$res = DashboardLog::read_log_file($offset, 'TEST');
-		$this->assertEquals($this->messages[1]."\n", $res['text'][0]);
+		$res3 = DashboardLog::read_log_file($offset, 'TEST');
+		$this->assertEquals($this->messages[1]."\n", $res3['text'][0]);
 	}
 	
 	/*

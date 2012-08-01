@@ -6,7 +6,7 @@ class DashboardSessionStorage {
 	private static $instance = null;
 	/** @var int Number of requests that are stored in the session */
 	public static $requests_to_keep = 10;
-	private static $session_key = 'DEVELOPER_DASHBOARD';
+	public static $session_key = 'DEVELOPER_DASHBOARD';
 	private static $log_message_key = 'LOG_MESSAGES';
 	
 	private $session_data = array();

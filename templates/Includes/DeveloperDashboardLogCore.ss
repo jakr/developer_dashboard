@@ -2,11 +2,11 @@
 <div class="request $RequestID">
 ==== $RequestID $RequestMethod $RequestURI (User: $UserID) ====<br />
 <% loop $Children %>
-<p class="$StreamID">
+<div class="ssdd-stream-data $StreamID">
   <span class="streamID">[$StreamID]</span> 
   <span class="Timestamp">$Timestamp</span> 
   <span class="Message">$Message</span>
-</p>
+</div>
 <% end_loop %>
 </div>
 <% end_loop %>

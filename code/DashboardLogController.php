@@ -43,7 +43,7 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 		
 		$logarea = new CompositeField(new LiteralField('internalName', $logContents));
                 $logarea->addExtraClass('SSDD-log-area');
-		$panel->addFormField($logarea->performReadonlyTransformation());		
+		$panel->addFormField($logarea->performReadonlyTransformation());
 	}
 	
 	private function addLogPanel(){
@@ -51,6 +51,8 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 		$panel->setContentProvider($this);
 		$panel->forwardAction('getlog', $this);
 		DeveloperDashboard::inst()->addPanel($panel);
+		Requirements::css('developer_dashboard/css/ss_developer_dashboard_log.css');
+		Requirements::javascript('developer_dashboard/javascript/dashboard_log.js');
 	}
 	
 }

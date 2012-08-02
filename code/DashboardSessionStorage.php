@@ -5,7 +5,7 @@
 class DashboardSessionStorage {
 	private static $instance = null;
 	/** @var int Number of requests that are stored in the session */
-	public static $requests_to_keep = 2;
+	public static $requests_to_keep = 10;
 	/** @var string the key under which the values are stored in the session.*/
 	public static $session_key = 'DEVELOPER_DASHBOARD';
 	/** 
@@ -47,13 +47,6 @@ class DashboardSessionStorage {
 				}
 			}
 		}
-		//Append new array for messages written by this request.
-		$this->sessionData[self::$log_message_key][$this->requestNumber] = array(
-			'messages' => array(),
-			'method' => $_SERVER['REQUEST_METHOD'],
-			'URI' => $_SERVER['REQUEST_URI'],
-			'userID' => Member::currentUserID() ? Member::currentUserID() : 'none'
-		); 
 	}
 	
 	/**
@@ -81,6 +74,15 @@ class DashboardSessionStorage {
 	}
 	
 	public function storeMessageObject($messageObj) {
+		if(!isset($this->sessionData[self::$log_message_key][$this->requestNumber])){
+			//Append new array for messages written by this request.
+			$this->sessionData[self::$log_message_key][$this->requestNumber] = array(
+				'messages' => array(),
+				'method' => $_SERVER['REQUEST_METHOD'],
+				'URI' => $_SERVER['REQUEST_URI'],
+				'userID' => Member::currentUserID() ? Member::currentUserID() : 'none'
+			);
+		}
 		$this->sessionData[self::$log_message_key][$this->requestNumber]
 				['messages'][] = $messageObj;
 		$this->updateSession();
@@ -94,6 +96,7 @@ class DashboardSessionStorage {
 	 * @return array the logged messages as strings, one message per entry. 
 	 */
 	public function getLogFileMessages() {
+		if(!isset($this->sessionData[self::$log_message_key][$this->requestNumber])) return;
 		$ret = array();
 		$data = $this->sessionData[self::$log_message_key][$this->requestNumber];
 		foreach($data['messages'] as $message){

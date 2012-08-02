@@ -26,6 +26,9 @@ class DashboardLogWrapper {
 	}
 	
 	public function log($message, $priority = Zend_Log::INFO, $extras=null){
+		if(is_object($message) || is_array($message)){
+			$message = '<pre>'.print_r($message,1).'</pre>';
+		}
 		$this->logger->log($message, $priority, $extras);
 	}
 	

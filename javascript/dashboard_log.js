@@ -23,9 +23,10 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 	jQuery.get(url, function (data) {
 		var jqData = jQuery(data);
 		//Hide new messages that belong to a stream that has been hidden.
-		jqData.children('p').each(function() {
+		jqData.children('.ssdd-stream-data').each(function() {
 			var visible = jQuery('#set-stream-visibility-'+this.className +' .btn')
-				.hasClass('btn-success'); 
+				.hasClass('btn-success');
+			if(!visible) jQuery(this).addClass('hide');
 			if(timestampHidden){
 				jQuery(this).children('.Timestamp').addClass('hide');
 			}

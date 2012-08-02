@@ -6,7 +6,7 @@ class DashboardLog {
 	 * If the path starts with .. it is assumed to be relative to this
 	 *  file's location.
 	 */
-	public static $log_file_path = '../../debug.log';
+	public static $log_file_path = '../../assets/debug.log';
 	
 	/** @var boolean If true the log messages are also written to a file. */
 	public static $copy_to_file = false;
@@ -37,7 +37,7 @@ class DashboardLog {
 			}
 			$logWrap = new DashboardLogWrapper();
 			$writer = DashboardLogWriter::get_log_writer($streamID);
-			$logWrap->logger->addWriter($writer); 
+			$logWrap->logger->addWriter($writer);
 			if(self::$log_file_writer != null && self::$copy_to_file){
 				$logWrap->logger->addWriter(self::$log_file_writer);
 			}

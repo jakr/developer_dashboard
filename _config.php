@@ -1,6 +1,4 @@
 <?php
-Director::set_environment_type('dev');
-
 URLVariableToolController::add_urlvariable_panel();
 DashboardLogController::add_log_panel();
 

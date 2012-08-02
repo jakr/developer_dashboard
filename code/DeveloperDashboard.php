@@ -62,6 +62,7 @@ class DeveloperDashboard extends Controller {
 			// it is too late to use SapphireTest::is_running_test()
 			&& strstr($_SERVER['REQUEST_URI'], '/dev/tests/') === false
 			&& Permission::check('ADMIN') //Required DB connection missing during tests!
+			&& strstr($_SERVER['REQUEST_URI'], $this->Link()) === false
 		){
 			echo '<div><a href="'.Director::absoluteURL($this->Link())
 					.'">Open Developer Dashboard</a></div>';

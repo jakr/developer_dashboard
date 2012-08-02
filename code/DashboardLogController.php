@@ -23,6 +23,12 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 		return $this->renderWith('DeveloperDashboardLogAjax');
 	}
 	
+	public function getstreambutton(SS_HTTPRequest $request = null){
+		if($request == null) return;
+		$ad = new ArrayData(array('Title'=>$request->latestParam('ID')));
+		return $ad->renderWith('DashboardStreamControlButton');
+	}
+	
 	/**
 	 * Called by the panel before it is displayed, adds the log data.
 	 * @param DashboardPanel $panel
@@ -37,7 +43,7 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 				$stream->StreamID
 			));
 		}
-		$buttons->addExtraClass('btn-toolbar');
+		$buttons->addExtraClass('btn-toolbar SSDD-log-stream-visibility-buttons');
 		$panel->addFormField($buttons);
 		$logContents = $this->getlog();
 		
@@ -50,6 +56,7 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 		$panel = new DashboardPanel('Logs');
 		$panel->setContentProvider($this);
 		$panel->forwardAction('getlog', $this);
+		$panel->forwardAction('getstreambutton', $this);
 		DeveloperDashboard::inst()->addPanel($panel);
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard_log.css');
 		Requirements::javascript('developer_dashboard/javascript/dashboard_log.js');

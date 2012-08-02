@@ -23,10 +23,12 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 	jQuery.get(url, function (data) {
 		var jqData = jQuery(data);
 		//Hide new messages that belong to a stream that has been hidden.
-		jqData.children('.ssdd-stream-data').each(function() {
-			var visible = jQuery('#set-stream-visibility-'+this.className +' .btn')
-				.hasClass('btn-success');
-			if(!visible) jQuery(this).addClass('hide');
+		jqData.children('div').each(function() {
+			var btn = jQuery('#set-stream-visibility-'+this.className +' .btn');
+			var exists = btn.length > 0;
+			var visible = btn.hasClass('btn-success');
+			if(!exists) getNewButton(this.className);
+			if(exists && !visible) jQuery(this).addClass('hide');
 			if(timestampHidden){
 				jQuery(this).children('.Timestamp').addClass('hide');
 			}
@@ -35,6 +37,15 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 		area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
 	});
 	startUpdate(buttonID, refreshRate);
+}
+
+function getNewButton(streamID){
+	var url = window.location.pathname;
+	//append slash (if missing).
+	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 
+		+ 'getstreambutton/' + streamID;
+	//
+	jQuery.get(url, function (data) {jQuery('.SSDD-log-stream-visibility-buttons').append(data);});
 }
 
 function startUpdate(buttonID, refreshRate){
@@ -105,7 +116,6 @@ jQuery(function(){
 //TODO Enable in final version. Disabled for tests.
 //jQuery(function(){jQuery('#SSDD-toggle-update').click();});
 
-
 //wire up enable and hide stream buttons.
 jQuery(function(){
 	jQuery('.btn-group.set-stream-visibility').each(function(index){
@@ -122,4 +132,17 @@ jQuery(function(){
 			hideOtherStreams(streamId);
 		});
 	});
+});
+
+//check that all required buttons are present and load missing ones.
+jQuery(function(){
+	var missing = new Object();
+	jQuery('.SSDD-log-area .request div').each(function(){
+		if(jQuery('#set-stream-visibility-'+this.className).length == 0){
+			missing[this.className] = true;
+		}
+	})
+	for(var streamID in missing){
+		getNewButton(streamID);
+	}
 });

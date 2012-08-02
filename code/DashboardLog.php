@@ -17,8 +17,6 @@ class DashboardLog {
 	/** @var Zend_Log_Writer_Stream The writer used to write to the log file. */
 	private static $log_file_writer = null;
 	
-	private static $instance = null;
-	
 	private static $available_log_files = array();
 	
 	

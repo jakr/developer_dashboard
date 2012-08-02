@@ -11,12 +11,6 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 	if(typeof lastEntry != 'undefined') {
 		newestLogEntry = lastEntry.className.split(' ')[1];
 	}
-	jQuery(".SSDD-log-area .request").each(function() {
-		var requestId = this.className.split(' ')[1];
-		if(requestId > newestLogEntry){
-			newestLogEntry = requestId; 
-		}
-	});
 	var url = window.location.pathname;
 	//append slash (if missing).
 	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 

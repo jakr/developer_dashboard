@@ -103,8 +103,8 @@ class DashboardSessionStorage {
 	public function getMessagesFromSession($newerThan = 0) {
 		$requests = new ArrayList();
 		foreach($this->session_data[self::$log_message_key] as $key=>$messages){
-			//skip every request older than $newerThan
-			if($newerThan >= $key) continue;
+			//skip every request older than $newerThan and those without messages.
+			if($newerThan >= $key || count($messages) == 0) continue;
 			$requests->push(new ArrayData(array(
 				'Children' => new ArrayList($messages),
 				'RequestID' => $key

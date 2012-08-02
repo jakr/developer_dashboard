@@ -34,27 +34,6 @@ class URLVariableToolController extends Controller {
 		return array('redirect' => $target);
 	}
 	
-	public function savesettings($action, SS_HTTPRequest $request) {
-		$siteMode = $request->requestVar('site-mode');
-		if(!isset(self::$environment_types[$siteMode])){
-			return 'Invalid environment type';
-		}
-		if($siteMode != Director::get_environment_type()){
-			Director::set_environment_type($siteMode);
-			/*
-			 * TODO: Read out this setting at the beginning of the request
-			 *  and act accordingly (see next todo below).
-			 */
-			DashboardSessionStorage::inst()->storeSetting(
-				'REQUESTED_SITE_MODE', $siteMode);
-		}
-		/*
-		 * TODO implement retreiving settings
-		 * This could be used to append an URL paramter to any request.
-		 */
-		return;
-	}
-	
 	public function flush_all($actionName, SS_HTTPRequest $request, $form) {
 		return array('redirect' => $form->getController()->Link().'?flush=all');
 	}
@@ -81,15 +60,6 @@ class URLVariableToolController extends Controller {
 	
 	private function addUrlvariablePanel() {
 		$panel = new DashboardPanel('Tools');
-		
-		//Global settings
-		$panel->addFormField(new HeaderField('title-global-settings', 'Global Settings'));
-		$panel->addFormField(new DropdownField('site-mode', 'Mode', 
-			self::$environment_types, Director::get_environment_type()));
-		$panel->addFormField(
-			new FormAction('savesettings','Save Settings'),
-			$this
-		);
 		
 		//Global actions
 		$panel->addFormField(new HeaderField('title-global-actions', 'Global Actions'));

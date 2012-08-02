@@ -5,12 +5,17 @@
 class DashboardSessionStorage {
 	private static $instance = null;
 	/** @var int Number of requests that are stored in the session */
-	public static $requests_to_keep = 10;
+	public static $requests_to_keep = 2;
+	/** @var string the key under which the values are stored in the session.*/
 	public static $session_key = 'DEVELOPER_DASHBOARD';
+	/** 
+	 * @var string the key under which the log messages are stored in the session
+	 * This is an entry in the array $_SESSION[$session_key].
+	 */
 	private static $log_message_key = 'LOG_MESSAGES';
 	
-	private $session_data = array();
-	private $request_number = -1;
+	private $sessionData = array();
+	private $requestNumber = -1;
 	
 	
 	/**
@@ -26,24 +31,29 @@ class DashboardSessionStorage {
 			return;
 		}
 		Session::start();
-		$this->session_data = Session::get(self::$session_key);
-		if($this->session_data == null){
-			$this->session_data = array();
-			$this->session_data[self::$log_message_key] = array();
-			$this->request_number = 0;
+		$this->sessionData = Session::get(self::$session_key);
+		if($this->sessionData == null){
+			$this->sessionData = array();
+			$this->sessionData[self::$log_message_key] = array();
+			$this->requestNumber = 0;
 		} else {
-			$keys = array_keys($this->session_data[self::$log_message_key]);
-			$this->request_number = end($keys) + 1;
+			$keys = array_keys($this->sessionData[self::$log_message_key]);
+			$this->requestNumber = end($keys) + 1;
 			//remove old requests.
 			$elements = count($keys) + 1;
 			if($elements + 1 > self::$requests_to_keep){
 				for($i=0; $i<$elements-self::$requests_to_keep; $i++){
-					unset($this->session_data[self::$log_message_key][$keys[$i]]);
+					unset($this->sessionData[self::$log_message_key][$keys[$i]]);
 				}
 			}
 		}
 		//Append new array for messages written by this request.
-		$this->session_data[self::$log_message_key][$this->request_number] = array(); 
+		$this->sessionData[self::$log_message_key][$this->requestNumber] = array(
+			'messages' => array(),
+			'method' => $_SERVER['REQUEST_METHOD'],
+			'URI' => $_SERVER['REQUEST_URI'],
+			'userID' => Member::currentUserID() ? Member::currentUserID() : 'none'
+		); 
 	}
 	
 	/**
@@ -58,20 +68,21 @@ class DashboardSessionStorage {
 	}
 	
 	public function storeSetting($name, $value){
-		$this->session_data[$name] = $value;
+		$this->sessionData[$name] = $value;
 		$this->updateSession();
 	}
 	
 	public function loadSetting($name){
-		if(!isset($this->session_data[$name])){
+		if(!isset($this->sessionData[$name])){
 			return false;
 		} else {
-			return $this->session_data[$name];
+			return $this->sessionData[$name];
 		}		
 	}
 	
 	public function storeMessageObject($messageObj) {
-		$this->session_data[self::$log_message_key][$this->request_number][] = $messageObj;
+		$this->sessionData[self::$log_message_key][$this->requestNumber]
+				['messages'][] = $messageObj;
 		$this->updateSession();
 	}
 
@@ -84,7 +95,8 @@ class DashboardSessionStorage {
 	 */
 	public function getLogFileMessages() {
 		$ret = array();
-		foreach($this->session_data[self::$log_message_key][$this->request_number] as $message){
+		$data = $this->sessionData[self::$log_message_key][$this->requestNumber];
+		foreach($data['messages'] as $message){
 			$ret[] = $message->__toString();
 		}
 		return $ret;
@@ -102,19 +114,22 @@ class DashboardSessionStorage {
 	 */
 	public function getMessagesFromSession($newerThan = 0) {
 		$requests = new ArrayList();
-		foreach($this->session_data[self::$log_message_key] as $key=>$messages){
+		foreach($this->sessionData[self::$log_message_key] as $key=>$data){
 			//skip every request older than $newerThan and those without messages.
-			if($newerThan >= $key || count($messages) == 0) continue;
+			if($newerThan >= $key || count($data['messages']) == 0) continue;
 			$requests->push(new ArrayData(array(
-				'Children' => new ArrayList($messages),
-				'RequestID' => $key
+				'Children' => new ArrayList($data['messages']),
+				'RequestID' => $key,
+				'RequestMethod' => $data['method'],
+				'RequestURI' => $data['URI'],
+				'UserID' => $data['userID']
 			)));
 		}
 		return $requests;
 	}
 	
 	private function updateSession(){
-		Session::set(self::$session_key, $this->session_data);
+		Session::set(self::$session_key, $this->sessionData);
 		Session::save();
 	}
 }

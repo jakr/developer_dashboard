@@ -1,6 +1,6 @@
 <% loop $GetLoggedData %>
 <div class="request $RequestID">
-==== $RequestID ====<br />
+==== $RequestID $RequestMethod $RequestURI (User: $UserID) ====<br />
 <% loop $Children %>
 <p class="$StreamID">
   <span class="streamID">[$StreamID]</span> 

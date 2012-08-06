@@ -53,7 +53,6 @@ function hideOldRequests(){
 	}
 	var target = jQuery('.SSDD-log-area .request');
 	target.addClass('hide');
-	console.log(target.length - value);
 	target.filter(':gt('+(target.length - value - 1)+')').removeClass('hide');
 }
 

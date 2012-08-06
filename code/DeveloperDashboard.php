@@ -70,15 +70,12 @@ class DeveloperDashboard extends Controller {
 	}
 	
 	public function addPanel(DashboardPanel $panel){
-		if($this->form){
-			$this->form->addPanel($panel);
-		} else {
-			self::$storedPanels[] = $panel;
-		}
+		self::$storedPanels[] = $panel;
 		foreach($panel->Actions() as $actionName => $callbackInfo){
 			self::$actions[$actionName] = $callbackInfo;
 		}
 	}
+
 	private function addStoredPanels(){
 		if(!$this->form){
 			throw new UnexpectedValueException(

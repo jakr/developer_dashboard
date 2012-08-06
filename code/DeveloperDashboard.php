@@ -93,16 +93,6 @@ class DeveloperDashboard extends Controller {
 	}
 	
 	/**
-	 * Get the available streams (=stream ids).
-	 * @see DashboardLogWriter::get_stream_ids()
-	 * 
-	 * @return ArrayList
-	 */
-	public function GetStreams(){
-		return DashboardLogWriter::get_stream_ids();
-	}
-	
-	/**
 	 * Get the URL that was visited last (see the php doc for HTTP_REFERER).
 	 * 
 	 * If the previous page cannot be determined or if it was this Controller,

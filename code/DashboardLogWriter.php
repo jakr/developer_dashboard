@@ -68,8 +68,12 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 			$event['message'] = $event['message']['errstr'];
 		}
 		
+		
+		$streamID = isset($event['streamID']) ? $event['streamID'] 
+			: $this->streamID;
+		
 		$this->storage->storeMessageObject(
-			new DashboardLogMessage($event, $this->streamID)
+			new DashboardLogMessage($event, $streamID)
 		);
 	}
 }

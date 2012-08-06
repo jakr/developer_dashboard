@@ -4,7 +4,7 @@ var updateIntervalId = null;
 /**
  * Run an AJAX request to get new log messages from the server.
  */
-function developerDashboardGetNewData(buttonID, refreshRate) {
+function dashboardLogGetNewData(buttonID, refreshRate) {
 	var timestampHidden = jQuery('.Timestamp').first().hasClass('hide');
 	var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
 	var newestLogEntry = 0;
@@ -23,12 +23,14 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 	jQuery.get(url, function (data) {
 		var jqData = jQuery(data);
 		if(jqData.length == 0) return;
+		//streams that have no control button
+		var missing = new Object();
 		//Hide new messages that belong to a stream that has been hidden.
 		jqData.children('div').each(function() {
 			var btn = jQuery('#set-stream-visibility-'+this.className +' .btn');
 			var exists = btn.length > 0;
 			var visible = btn.hasClass('btn-success');
-			if(!exists) getNewButton(this.className);
+			if(!exists) missing[this.className] = true;
 			if(exists && !visible) jQuery(this).addClass('hide');
 			if(timestampHidden){
 				jQuery(this).children('.Timestamp').addClass('hide');
@@ -36,6 +38,9 @@ function developerDashboardGetNewData(buttonID, refreshRate) {
 		});
 		var area = jQuery('.SSDD-log-area').append(jqData);
 		area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
+		for(var streamID in missing){
+			getNewButton(streamID);
+		}
 	});
 	startUpdate(buttonID, refreshRate);
 }
@@ -45,8 +50,9 @@ function getNewButton(streamID){
 	//append slash (if missing).
 	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 
 		+ 'getstreambutton/' + streamID;
-	//
-	jQuery.get(url, function (data) {jQuery('.SSDD-log-stream-visibility-buttons').append(data);});
+	jQuery.get(url, function(data){
+		jQuery('.SSDD-log-stream-visibility-buttons').append(data);
+	});
 }
 
 function startUpdate(buttonID, refreshRate){
@@ -57,7 +63,7 @@ function startUpdate(buttonID, refreshRate){
 	jQuery('#ssdd-progress-bar-' + buttonID).animate({width: '4em'}, 10)
 	.animate({width: '0'}, {
 			duration: refreshRate, 
-			complete: function(){developerDashboardGetNewData(buttonID, refreshRate);}
+			complete: function(){dashboardLogGetNewData(buttonID, refreshRate);}
 		}
 	);
 }
@@ -82,7 +88,6 @@ function showStream(streamID){
 }
 
 function hideOtherStreams(showStreamID){
-	console.log(showStreamID);
 	jQuery('.set-stream-visibility').each(function(){
 		hideStream(jQuery(this).children().first().text());
 	})
@@ -113,8 +118,7 @@ jQuery(function(){
 	jQuery('#toggle_display_timestamp').click();
 });
 
-//turn on updates
-//TODO Enable in final version. Disabled for tests.
+//Uncomment next line to turn on automatic updating on first load.
 //jQuery(function(){jQuery('#SSDD-toggle-update').click();});
 
 //wire up enable and hide stream buttons.

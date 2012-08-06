@@ -125,7 +125,8 @@ class DashboardSessionStorage {
 				'RequestID' => $key,
 				'RequestMethod' => $data['method'],
 				'RequestURI' => $data['URI'],
-				'UserID' => $data['userID']
+				'UserID' => $data['userID'],
+				'ZebraStripe' => ($key % 2 == 0 ? 'even' : 'odd')
 			)));
 		}
 		return $requests;

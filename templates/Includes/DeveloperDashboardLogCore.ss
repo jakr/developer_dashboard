@@ -1,5 +1,5 @@
 <% loop $GetLoggedData %>
-<div class="request $RequestID">
+<div class="request $RequestID $ZebraStripe">
 ==== $RequestID $RequestMethod $RequestURI (User: $UserID) ====<br />
 <% loop $Children %>
 <div class="$StreamID">

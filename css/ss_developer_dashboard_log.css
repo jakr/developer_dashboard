@@ -9,7 +9,13 @@ div#SSDD-toggle-update, div#SSDD-log-area {
 	height: 30em;
 	overflow-y: auto;
 }
-.SSDD-log-area .request p {
+.SSDD-log-area .request.even {
+	background-color: #D3D3D3;
+}
+.SSDD-log-area .request.odd {
+	background-color: #E2E2E2;
+}
+.SSDD-log-area .request div {
 	margin-bottom: 0;
 }
 .automatic-refresh-button {

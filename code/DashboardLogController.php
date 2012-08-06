@@ -34,17 +34,23 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 	 * @param DashboardPanel $panel
 	 */
 	public function getPanelContent(DashboardPanel $panel){
-		$buttons = new CompositeField();
-		$buttons->push(new AutomaticRefreshButton('getlog', 'Update'));
-		$buttons->push(new JSOnlyButton('toggle_display_timestamp', 'Toggle Timestamps'));
+		$controls = new CompositeField();
+		$controls->push(new AutomaticRefreshButton('getlog', 'Update'));
+		$controls->push(new JSOnlyButton('toggle_display_timestamp', 'Toggle Timestamps'));
+		$requests = array('all' => 'All');
+		for($i=1; $i <= DashboardSessionStorage::$requests_to_keep; $i++){
+			$requests[$i] = $i;
+		}
+		$controls->push(new DropdownField('show_last_requests', 
+				'Number of Requests to display', $requests, 'all'));
 		foreach(DashboardLogWriter::get_stream_ids() as $stream){
-			$buttons->push(new DashboardStreamControlButton(
+			$controls->push(new DashboardStreamControlButton(
 				$stream->StreamID,
 				$stream->StreamID
 			));
 		}
-		$buttons->addExtraClass('btn-toolbar SSDD-log-stream-visibility-buttons');
-		$panel->addFormField($buttons);
+		$controls->addExtraClass('btn-toolbar SSDD-log-stream-visibility-buttons');
+		$panel->addFormField($controls);
 		$logContents = $this->getlog();
 		
 		$logarea = new CompositeField(new LiteralField('internalName', $logContents));

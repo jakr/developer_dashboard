@@ -1,9 +1,7 @@
 var SSDD_refreshRate = 5000;
 var updateIntervalId = null;
 
-/**
- * Run an AJAX request to get new log messages from the server.
- */
+// Run an AJAX request to get new log messages from the server.
 function dashboardLogGetNewData(buttonID, refreshRate) {
 	var timestampHidden = jQuery('.Timestamp').first().hasClass('hide');
 	var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
@@ -41,10 +39,25 @@ function dashboardLogGetNewData(buttonID, refreshRate) {
 		for(var streamID in missing){
 			getNewButton(streamID);
 		}
+		hideOldRequests();
 	});
 	startUpdate(buttonID, refreshRate);
 }
 
+// Hide all requests older than the limit set in the show_last_requests dropdown.
+function hideOldRequests(){
+	var value = jQuery('#show_last_requests .dropdown').val();
+	if(value == 'all'){
+		jQuery('.SSDD-log-area .request').removeClass('hide');
+		return;
+	}
+	var target = jQuery('.SSDD-log-area .request');
+	target.addClass('hide');
+	console.log(target.length - value);
+	target.filter(':gt('+(target.length - value - 1)+')').removeClass('hide');
+}
+
+// Get the html for the button that controls streamID using an AJAX request.
 function getNewButton(streamID){
 	var url = window.location.pathname;
 	//append slash (if missing).
@@ -55,6 +68,7 @@ function getNewButton(streamID){
 	});
 }
 
+// Start automatic update countdown for the button with id buttonID
 function startUpdate(buttonID, refreshRate){
 	var button = jQuery('#ARB-' + buttonID);
 	if(button.hasClass('off')){
@@ -68,25 +82,28 @@ function startUpdate(buttonID, refreshRate){
 	);
 }
 
+// Stop automatic update for the button with id buttonID
 function stopUpdate(buttonID){
 	jQuery('#ssdd-progress-bar-' + buttonID).stop().css('width', '4em');
 	jQuery('#ARB-' + buttonID).addClass('off').children('.btn')
 		.removeClass('btn-success').text('Off');
-	
 }
 
+// Hide the stream streamID
 function hideStream(streamID){
 	jQuery('.SSDD-log-area .' + streamID).addClass('hide');
 	var buttonSelector = '#set-stream-visibility-' + streamID + ' .btn'; 
 	jQuery(buttonSelector).removeClass('btn-success');
 }
 
+// Show the stream streamID
 function showStream(streamID){
 	jQuery('.SSDD-log-area .' + streamID).removeClass('hide');
 	var buttonSelector = '#set-stream-visibility-' + streamID + ' .btn'; 
 	jQuery(buttonSelector).addClass('btn-success');
 }
 
+// Hide all streams except the one specified by showStreamID.
 function hideOtherStreams(showStreamID){
 	jQuery('.set-stream-visibility').each(function(){
 		hideStream(jQuery(this).children().first().text());
@@ -137,6 +154,11 @@ jQuery(function(){
 			hideOtherStreams(streamId);
 		});
 	});
+});
+
+//onchange event for the dropdown that controls the number of requests displayed.
+jQuery(function(){
+	jQuery('#show_last_requests .dropdown').change(hideOldRequests);
 });
 
 //check that all required buttons are present and load missing ones.

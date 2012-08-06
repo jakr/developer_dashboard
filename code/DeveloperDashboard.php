@@ -24,16 +24,16 @@ class DeveloperDashboard extends Controller {
 	public function init(){
 		parent::init();
 		
+		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
+		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
+		Requirements::javascript('developer_dashboard/thirdparty/bootstrap/js/bootstrap.min.js');
+		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
+		
 		$this->form = new DashboardForm($this, 'DashboardForm', 
 			new FieldList(new TabSet("Root")), 
 			new FieldList(new TabSet("Root"))
 		);
 		$this->addStoredPanels();
-		
-		Requirements::css(FRAMEWORK_DIR.'/admin/css/screen.css');
-		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
-		Requirements::javascript('developer_dashboard/thirdparty/bootstrap/js/bootstrap.min.js');
-		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
 		
 	}
 

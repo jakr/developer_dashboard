@@ -10,12 +10,12 @@ require_once 'Zend/Log.php';
 require_once 'Zend/Log/Writer/Abstract.php';
 class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 	private static $log_writers = array();
-	
+
 	/** @var string the stream id of this log writer*/
 	private $streamID;
 	/** @var DashboardLogSessionStorage The object that stores our messages. */
 	private $storage;
-	
+
 	/**
 	 * It is required to implement this method.
 	 *  
@@ -26,7 +26,7 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 		$streamID = isset($config['streamID']) ? $config['streamID'] : 'DEFAULT';
 		return self::get_log_writer($streamID);
 	}
-	
+
 	/**
 	 * A method to get an instance for a given streamID, similar to a factory.
 	 * @param string $streamID
@@ -38,7 +38,7 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 		}
 		return self::$log_writers[$streamID];
 	}
-	
+
 	/**
 	 * Get the available stream ids.
 	 * @return ArrayList each ArrayData item has an attribute StreamID.
@@ -50,7 +50,11 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 		}
 		return $streamIds;
 	}
-	
+
+	/**
+	 * Private constructor. Use get_log_writer() or factory().
+	 * @param type $streamID
+	 */
 	private function __construct($streamID) {
 		$this->streamID = $streamID;
 		$this->storage = DashboardSessionStorage::inst();
@@ -75,11 +79,10 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 		){
 			$event['message'] = $event['message']['errstr'];
 		}
-		
-		
+
 		$streamID = isset($event['streamID']) ? $event['streamID'] 
 			: $this->streamID;
-		
+
 		$this->storage->storeMessageObject(
 			new DashboardLogMessage($event, $streamID)
 		);

@@ -12,10 +12,6 @@ class DashboardLogFileController extends Controller implements DashboardPanelCon
 	}
 
 	public function getPanelContent(DashboardPanel $panel) {
-		$panel->addFormField(new AutomaticRefreshButton('readlogfile', 'Update'));
-		$lines = array('10'=>'10', '20'=>'20', '50' => '50', '100'=>'100', '100+'=>'100+');
-		$panel->addFormField(new DropDownField('show_last_lines', 
-				'Number of lines to show', $lines, '100+'));
 		$fields = array();
 		foreach(DashboardLogFile::get_available_log_files() as $name){
 			$this->fileKey = $name;
@@ -24,7 +20,17 @@ class DashboardLogFileController extends Controller implements DashboardPanelCon
 			$logarea->addExtraClass('SSDD-log-file-area-'.$name);
 			$fields[$name] = $logarea;
 		}
-		$panel->addFormField(new SelectionGroup('SSDD-files-selection', $fields));
+		if(count($fields) > 0){
+			$panel->addFormField(new AutomaticRefreshButton('readlogfile', 'Update'));
+			$lines = array('10'=>'10', '20'=>'20', '50' => '50', '100'=>'100', '100+'=>'100+');
+			$panel->addFormField(new DropDownField('show_last_lines', 
+				'Number of lines to show', $lines, '100+'));
+			$panel->addFormField(new SelectionGroup('SSDD-files-selection',
+				$fields));
+		} else {
+			$panel->addFormField(new LiteralField('internalName',
+					'Use DashboardLogFile::register_log_file() to register log files.'));
+		}
 	}
 	
 	public function ReadLogData(){

@@ -16,13 +16,9 @@
 class DashboardLog {
 	/** 
 	 * @var string Override the default log file path with this path.
-	 * If the path starts with .. it is assumed to be relative to this
-	 *  file's location.
+	 * The path is always relative to this file's location.
 	 */
 	public static $log_file_path = '../../assets/debug.log';
-	
-	/** @var boolean If true the log messages are also written to a file. */
-	public static $copy_to_file = false;
 	
 	/** @var array the DashboardLogWrappers that were created. */
 	private static $logWrappers = array();
@@ -31,18 +27,29 @@ class DashboardLog {
 	/**
 	 * Get an instance of the log wrapper for the given streamID.
 	 * 
+	 * If $copyToFile is true, all content written to the logger will be
+	 *  copied to the file specified by $log_file_path.
+	 * 
 	 * @param string $streamID
+	 * @param boolean $copyToFile defaults to false
 	 * @return DashboardLogWrapper
 	 */
-	public static function get_log_wrapper($streamID = 'DEFAULT') {
+	public static function get_log_wrapper($streamID = 'DEFAULT',
+		$copyToFile = false
+	) {
 		$streamID = str_replace(' ', '-', $streamID); //remove spaces.
 		if(!isset(self::$logWrappers[$streamID])) {
 			$logWrap = new DashboardLogWrapper();
 			$writer = DashboardLogWriter::get_log_writer($streamID);
 			$logWrap->logger->addWriter($writer);
-			if(self::$copy_to_file){
-				DashboardLogFile::register_log_file(__class__, self::$log_file_path);
-				$logWrap->logger->addWriter(DashboardLogFile::get_writer(__class__));
+			if($copyToFile){
+				$path = dirname(__FILE__).'/'.self::$log_file_path;
+				//Open the file to make sure it exists.
+				$file = fopen($path, 'a');
+				if($file) fclose($file);
+				DashboardLogFile::register_log_file(__class__, $path);
+				$logWrap->logger->addWriter(
+						DashboardLogFile::get_log_file_writer(__class__));
 			}
 			self::$logWrappers[$streamID] = $logWrap;
 		}

@@ -58,7 +58,7 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 
 	/**
      * Write a message to the log. If the message contains HTML/XML,
-	 *  the caller is responsible for setting $event['XMLSafe']
+	 *  the caller is responsible for setting $event['asXML']
 	 *  to an XML safe representation.
 	 * 
 	 * @see Zend_Log_Writer_Abstract

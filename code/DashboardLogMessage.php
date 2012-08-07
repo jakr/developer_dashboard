@@ -6,7 +6,7 @@ class DashboardLogMessage extends ViewableData {
 	public $StreamID;
 	public $Timestamp;
 	public $Message;
-	public $XMLSafeMessage;
+	public $MessageAsXML;
 	
 	/**
 	 * Construct from a Zend_Log message.
@@ -15,7 +15,7 @@ class DashboardLogMessage extends ViewableData {
 	 */
 	public function __construct($event, $streamID){
 		$this->Message = $event['message'];
-		$this->XMLSafeMessage = isset($event['XMLSafe']) ? $event['XMLSafe'] : null;
+		$this->MessageAsXML = isset($event['asXML']) ? $event['asXML'] : null;
 		$this->StreamID = $streamID;
 		$this->Timestamp = $event['timestamp'];
 	}
@@ -34,7 +34,7 @@ class DashboardLogMessage extends ViewableData {
 	 */
 	public function toXML(){
 		return "[{$this->StreamID}] {$this->Timestamp} "
-			.$this->XMLSafeMessage != null ? $this->XMLSafeMessage 
+			.$this->MessageAsXML != null ? $this->MessageAsXML 
 				: Convert::raw2xml($this->Message);
 	}
 	

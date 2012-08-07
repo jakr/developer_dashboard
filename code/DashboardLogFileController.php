@@ -4,7 +4,7 @@
  */
 class DashboardLogFileController extends Controller implements DashboardPanelContentProvider {
 	private $fileKey;
-	private $offset = -10;
+	private $offset = -20;
 	
 	public static function add_log_file_panel(){
 		$dlfc = new self();
@@ -13,6 +13,9 @@ class DashboardLogFileController extends Controller implements DashboardPanelCon
 
 	public function getPanelContent(DashboardPanel $panel) {
 		$panel->addFormField(new AutomaticRefreshButton('readlogfile', 'Update'));
+		$lines = array('10'=>'10', '20'=>'20', '50' => '50', '100'=>'100', '100+'=>'100+');
+		$panel->addFormField(new DropDownField('show_last_lines', 
+				'Number of lines to show', $lines, '100+'));
 		$fields = array();
 		foreach(DashboardLogFile::get_available_log_files() as $name){
 			$this->fileKey = $name;
@@ -33,6 +36,7 @@ class DashboardLogFileController extends Controller implements DashboardPanelCon
 		}
 		$items = new ArrayList();
 		foreach($data['text'] as $line){
+			if(trim($line) == '') continue;
 			$items->push(new ArrayData(array('Line' => $line)));
 		}
 		return new ArrayData(array(

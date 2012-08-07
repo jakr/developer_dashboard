@@ -1,25 +1,14 @@
 var SSDD_refreshRate = 5000;
 
 // Run an AJAX request to get new log messages from the server.
-function dashboardLogGetNewData(buttonID, refreshRate) {
-	var timestampHidden = jQuery('.Timestamp').first().hasClass('hide');
+// urlFunc is a function that returns the URL to call,
+// complete is a function that returns a jQuery object to which the
+//  result of the request should be appended.
+function dashboardLogGetNewData(buttonID, refreshRate, urlFunc, completeFunc) {
 	var url = window.location.pathname;
 	//append slash (if missing).
 	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' );
-	if(buttonID == 'action_getlog'){
-		var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
-		var	newestLogEntry = 0;
-		if(typeof lastEntry != 'undefined') {
-			newestLogEntry = lastEntry.className.split(' ')[1];
-		}
-		url = url + 'getlog/' + newestLogEntry;
-	} else {
-		console.log(buttonID);
-		var filename = jQuery('#Root_Files .SelectionGroup :checked').val();
-		var offset = jQuery('#Root_Files .SelectionGroup .'+filename+'-posEOF').last().html();
-		url = url + 'readlogfile/' + filename + '/' + offset ;
-		console.log(url);
-	}
+	url = url + urlFunc();
 
 	//flash the off/on button to indicate that it is active.
 	jQuery('#ARB-' + buttonID).children().first().css('opacity', 0.5)
@@ -28,35 +17,33 @@ function dashboardLogGetNewData(buttonID, refreshRate) {
 	jQuery.get(url, function (data) {
 		var jqData = jQuery(data);
 		if(jqData.length == 0) return;
-		//streams that have no control button
-		var missing = new Object();
-		//Hide new messages that belong to a stream that has been hidden.
-		jqData.children('div').each(function() {
-			var btn = jQuery('#set-stream-visibility-'+this.className +' .btn');
-			var exists = btn.length > 0;
-			var visible = btn.hasClass('btn-success');
-			if(!exists) missing[this.className] = true;
-			if(exists && !visible) jQuery(this).addClass('hide');
-			if(timestampHidden){
-				jQuery(this).children('.Timestamp').addClass('hide');
-			}
-		});
-		var area = null;
-		if(buttonID == 'action_getlog'){
-			area = jQuery('.SSDD-log-area').append(jqData);
-		} else {
-			var filename = jQuery('#Root_Files .SelectionGroup :checked').val();
-			area = jQuery('.SSDD-log-file-area-'+filename).append(jqData);
-		}
-		area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
-		if(buttonID == 'action_getlog'){
-			for(var streamID in missing){
-				getNewButton(streamID);
-			}
-			hideOldRequests();
+		completeFunc(jqData);
+	});
+	startUpdateCountdown(buttonID, refreshRate, urlFunc, completeFunc);
+}
+
+//callback for log panel
+function dashboardLogUpdateComplete(jqData){
+	var timestampHidden = jQuery('.SSDD-log-area .Timestamp').first().hasClass('hide');
+	//streams that have no control button
+	var missing = new Object();
+	//Hide new messages that belong to a stream that has been hidden.
+	jqData.children('div').each(function() {
+		var btn = jQuery('#set-stream-visibility-'+this.className +' .btn');
+		var exists = btn.length > 0;
+		var visible = btn.hasClass('btn-success');
+		if(!exists) missing[this.className] = true;
+		if(exists && !visible) jQuery(this).addClass('hide');
+		if(timestampHidden){
+			jQuery(this).children('.Timestamp').addClass('hide');
 		}
 	});
-	startUpdateCountdown(buttonID, refreshRate);
+	var area = jQuery('.SSDD-log-area').append(jqData);
+	area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
+	for(var streamID in missing){
+		getNewButton(streamID);
+	}
+	hideOldRequests();
 }
 
 // Hide all requests older than the limit set in the show_last_requests dropdown.
@@ -71,6 +58,18 @@ function hideOldRequests(){
 	target.filter(':gt('+(target.length - value - 1)+')').removeClass('hide');
 }
 
+function hideOldLines(){
+	var value = jQuery('#show_last_lines .dropdown').val();
+	var target = jQuery('#Root_Files .CompositeField .line');
+	if(value == '100+' || target.length - value <= 0){
+		target.removeClass('hide');
+		return;
+	}
+	target.addClass('hide');
+	target.filter(':gt('+(target.length - value - 1)+')').removeClass('hide');
+	
+}
+
 // Get the html for the button that controls streamID using an AJAX request.
 function getNewButton(streamID){
 	var url = window.location.pathname;
@@ -83,7 +82,9 @@ function getNewButton(streamID){
 }
 
 // Start automatic update countdown for the button with id buttonID
-function startUpdateCountdown(buttonID, refreshRate){
+// urlFunc is a function that returns the URL to call,
+// completeFunc is a function that is called with the result of the request.
+function startUpdateCountdown(buttonID, refreshRate, urlFunc, completeFunc){
 	var button = jQuery('#ARB-' + buttonID);
 	if(button.hasClass('off')){
 		button.removeClass('off').children('.btn').addClass('btn-success').text('On');
@@ -91,7 +92,9 @@ function startUpdateCountdown(buttonID, refreshRate){
 	jQuery('#ARB-progress-bar-' + buttonID).animate({width: '4em'}, 10)
 	.animate({width: '0'}, {
 			duration: refreshRate, 
-			complete: function(){dashboardLogGetNewData(buttonID, refreshRate);}
+			complete: function(){
+				dashboardLogGetNewData(buttonID, refreshRate, urlFunc, completeFunc);
+			}
 		}
 	);
 }
@@ -129,7 +132,17 @@ function hideOtherStreams(showStreamID){
 jQuery(function(){
 	jQuery('#ARB-action_getlog').toggle(
 		function() {
-			startUpdateCountdown('action_getlog', 5000);
+			startUpdateCountdown('action_getlog', 5000, 
+				function(){
+					var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
+					var	newestLogEntry = 0;
+					if(typeof lastEntry != 'undefined') {
+						newestLogEntry = lastEntry.className.split(' ')[1];
+					}
+					return 'getlog/' + newestLogEntry;
+				},
+				dashboardLogUpdateComplete
+			);
 		},
 		function() {
 			stopUpdateCountdown('action_getlog');
@@ -137,7 +150,19 @@ jQuery(function(){
 	);
 	jQuery('#ARB-action_readlogfile').toggle(
 		function() {
-			startUpdateCountdown('action_readlogfile', 5000);
+			startUpdateCountdown('action_readlogfile', 5000,
+				function(){
+					var filename = jQuery('#Root_Files .SelectionGroup :checked').val();
+					var offset = jQuery('#Root_Files .SelectionGroup .'+filename+'-posEOF').last().html();
+					return 'readlogfile/' + filename + '/' + offset ;
+				},
+				function(jqData){
+					var filename = jQuery('#Root_Files .SelectionGroup :checked').val();
+					if(jqData.filter('.line').length == 0) return;
+					jQuery('#Root_Files .SSDD-log-file-area-'+filename).append(jqData);
+					hideOldLines();
+				}
+			);
 		},
 		function() {
 			stopUpdateCountdown('action_readlogfile');
@@ -184,6 +209,7 @@ jQuery(function(){
 //onchange event for the dropdown that controls the number of requests displayed.
 jQuery(function(){
 	jQuery('#show_last_requests .dropdown').change(hideOldRequests);
+	jQuery('#show_last_lines .dropdown').change(hideOldLines);
 });
 
 //check that all required buttons are present and load missing ones.
@@ -202,7 +228,6 @@ jQuery(function(){
 jQuery(function(){
 	jQuery('#Root_Files .SelectionGroup input').change(function(event){
 		if(!event.target.checked) return;
-		console.log(event.target.value);
 		jQuery('#Root_Files .SelectionGroup .CompositeField').addClass('hide');
 		jQuery('#Root_Files .SSDD-log-file-area-'+event.target.value).removeClass('hide');
 	});

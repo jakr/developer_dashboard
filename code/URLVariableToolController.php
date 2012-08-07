@@ -7,7 +7,7 @@ class URLVariableToolController extends Controller {
 		'debug' => '1',
 		'debug_request' => '1',
 		'showtemplate' => '1',
-		'build_classmanifest' => '/dev/build',
+		'build_dbschema' => '/dev/build',
 		'flush_all' => array('flush', 'all'),
 		'flush_one' => array('flush', '1'),
 	);
@@ -70,7 +70,7 @@ class URLVariableToolController extends Controller {
 			new FormAction('flush_all', 'Flush template cache for all pages'),
 			$this);
 		$panel->addFormField(
-			new FormAction('build_classmanifest','Rebuild class manifest (dev/build)'),
+			new FormAction('build_dbschema','Rebuild database schema (dev/build)'),
 			$this, 'redirectHandler'
 		);
 		

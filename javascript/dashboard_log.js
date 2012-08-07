@@ -73,7 +73,7 @@ function startUpdateCountdown(buttonID, refreshRate){
 	if(button.hasClass('off')){
 		button.removeClass('off').children('.btn').addClass('btn-success').text('On');
 	}
-	jQuery('#ssdd-progress-bar-' + buttonID).animate({width: '4em'}, 10)
+	jQuery('#ARB-progress-bar-' + buttonID).animate({width: '4em'}, 10)
 	.animate({width: '0'}, {
 			duration: refreshRate, 
 			complete: function(){dashboardLogGetNewData(buttonID, refreshRate);}
@@ -83,7 +83,7 @@ function startUpdateCountdown(buttonID, refreshRate){
 
 // Stop automatic update for the button with id buttonID
 function stopUpdateCountdown(buttonID){
-	jQuery('#ssdd-progress-bar-' + buttonID).stop().css('width', '4em');
+	jQuery('#ARB-progress-bar-' + buttonID).stop().css('width', '4em');
 	jQuery('#ARB-' + buttonID).addClass('off').children('.btn')
 		.removeClass('btn-success').text('Off');
 }
@@ -111,19 +111,19 @@ function hideOtherStreams(showStreamID){
 }
 
 //click on the "toggle update" button, enables or disables updates via AJAX.
-jQuery(function(){jQuery('#ARB-Update').toggle(
+jQuery(function(){jQuery('#ARB-action_getlog').toggle(
 	function() {
-		startUpdateCountdown('Update', 5000);
+		startUpdateCountdown('action_getlog', 5000);
 	},
 	function() {
-		stopUpdateCountdown('Update');
+		stopUpdateCountdown('action_getlog');
 	}
 )});
 
 //Show / Hide Timestamps. Could be done using toggleClass,
 // but this way it will fix elements that have the wrong state. 
 jQuery(function(){
-	jQuery('#toggle_display_timestamp').toggle(
+	jQuery('#SSDD-log-toggle_display_timestamp').toggle(
 		function() {
 			jQuery('.Timestamp').addClass('hide');
 		},
@@ -131,7 +131,7 @@ jQuery(function(){
 			jQuery('.Timestamp').removeClass('hide');
 		}
 	);
-	jQuery('#toggle_display_timestamp').click();
+	jQuery('#SSDD-log-toggle_display_timestamp').click();
 });
 
 //Uncomment next line to turn on automatic updating on first load.

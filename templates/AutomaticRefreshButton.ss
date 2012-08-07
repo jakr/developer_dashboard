@@ -1,4 +1,4 @@
-<div id="ARB-{$Title}" class="automatic-refresh-button off">
+<div id="ARB-{$Name}" class="automatic-refresh-button off">
 <% if ButtonContent %>$ButtonContent<% else %>$Title<% end_if %>
 <div $AttributesHTML>Off</div>
 <noscript>
@@ -10,5 +10,5 @@
 	<input $AttributesHTML>
 <% end_if %>
 </noscript>
-<div class="ssdd-progress-bar" id="ssdd-progress-bar-{$Title}">&nbsp;</div>
+<div class="ssdd-progress-bar" id="ARB-progress-bar-{$Name}">&nbsp;</div>
 </div>

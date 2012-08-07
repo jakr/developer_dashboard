@@ -1,6 +1,6 @@
 <?php
 /**
- * The Controller for the dashboard log pabel.
+ * The Controller for the dashboard log panel.
  */
 class DashboardLogController extends Controller implements DashboardPanelContentProvider {
 	/**
@@ -28,7 +28,7 @@ class DashboardLogController extends Controller implements DashboardPanelContent
 	 * It gets called via AJAX.
 	 * @return string the HTML.
 	 */
-	public function getlog($request = null){
+	public function getlog(SS_HTTPRequest $request = null){
 		if($request != null) {
 			$this->request = $request;
 		}
@@ -54,7 +54,8 @@ class DashboardLogController extends Controller implements DashboardPanelContent
 	public function getPanelContent(DashboardPanel $panel){
 		$controls = new CompositeField();
 		$controls->push(new AutomaticRefreshButton('getlog', 'Update'));
-		$controls->push(new JSOnlyButton('toggle_display_timestamp', 'Toggle Timestamps'));
+		$controls->push(new JSOnlyButton('SSDD-log-toggle_display_timestamp',
+				'Toggle Timestamps'));
 		$requests = array('all' => 'All');
 		for($i=1; $i <= DashboardSessionStorage::$requests_to_keep; $i++){
 			$requests[$i] = $i;

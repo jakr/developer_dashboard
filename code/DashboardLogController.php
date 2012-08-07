@@ -54,8 +54,8 @@ class DashboardLogController extends Controller implements DashboardPanelContent
 	public function getPanelContent(DashboardPanel $panel){
 		$controls = new CompositeField();
 		$controls->push(new AutomaticRefreshButton('getlog', 'Update'));
-		$controls->push(new JSOnlyButton('SSDD-log-toggle_display_timestamp',
-				'Toggle Timestamps'));
+		$controls->push(new CheckboxField('SSDD-log-display_timestamps',
+				'Display timestamps', false));
 		$requests = array('all' => 'All');
 		for($i=1; $i <= DashboardSessionStorage::$requests_to_keep; $i++){
 			$requests[$i] = $i;

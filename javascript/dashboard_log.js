@@ -123,12 +123,13 @@ jQuery(function(){jQuery('#ARB-action_getlog').toggle(
 //Show / Hide Timestamps. Could be done using toggleClass,
 // but this way it will fix elements that have the wrong state. 
 jQuery(function(){
-	jQuery('#SSDD-log-toggle_display_timestamp').toggle(
-		function() {
-			jQuery('.Timestamp').addClass('hide');
-		},
-		function() {
-			jQuery('.Timestamp').removeClass('hide');
+	jQuery('#SSDD-log-display_timestamps').change(
+		function(event) {
+			if(event.target.checked){
+				jQuery('.Timestamp').removeClass('hide');
+			} else {
+				jQuery('.Timestamp').addClass('hide');
+			}
 		}
 	);
 	jQuery('#SSDD-log-toggle_display_timestamp').click();

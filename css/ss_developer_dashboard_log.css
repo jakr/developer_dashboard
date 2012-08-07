@@ -1,3 +1,6 @@
+body.cms{
+	overflow: visible !important;
+}
 div#SSDD-toggle-update, div#SSDD-log-area {
 	margin: 1em;
 	padding: 1em;

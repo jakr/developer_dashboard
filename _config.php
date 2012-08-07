@@ -11,4 +11,4 @@ SS_Log::add_writer(DashboardLogWriter::get_log_writer('SS_Log'));
 //Next lines require rewritten version of dev/Debug from branch debug_rewrite
 //$writers = DashboardLog::get_log_wrapper('DEBUG', true)->logger->getWriters();
 //Debug::replaceDefaultOutputWriter($writers[0]);
-//Debug::show('Hello World!');
+//Debug::show('Hello World!'); //Development mode required

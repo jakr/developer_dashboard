@@ -1,4 +1,18 @@
 <?php
+/**
+ * This is the factory class for log wrappers.
+ * 
+ * The recommended way of logging is:
+ *   1. Get a logWrapper by calling Log::get_log_wrapper.
+ *     We suggest using __class__ as the streamID:
+ *     $log_wrapper = Log::get_log_wrapper(__class__);
+ *   2. Check if the stream is enabled:
+ *     if($log_wrapper->is_enabled()) ...
+ *   3. Log your message
+ *	   $log_wrapper->log('Hello World');
+ * 
+ * If you are in a hurry, you can instead just call DashboardLog::log.
+ */
 require_once 'Zend/Log/Writer/Stream.php';
 class DashboardLog {
 	/** 
@@ -17,6 +31,7 @@ class DashboardLog {
 	/** @var Zend_Log_Writer_Stream The writer used to write to the log file. */
 	private static $log_file_writer = null;
 	
+	/** @var array the log files that can be viewed. */
 	private static $available_log_files = array();
 	
 	
@@ -69,6 +84,16 @@ class DashboardLog {
 		$wrapper->log($message, $priority);
 	}
 	
+	/**
+	 * Register the logfile at $path under as $name. It can then be read
+	 *  by calling read_log_file(-1, $name).
+	 * 
+	 * The log file already has to exist at $path, when this function is called!
+	 * 
+	 * @param string $name
+	 * @param string $path
+	 * @throws InvalidArgumentException if there is no file at $path
+	 */
 	public static function register_log_file($name, $path){
 		if(!is_file($path)){
 			throw new InvalidArgumentException("Invalid path: $path");

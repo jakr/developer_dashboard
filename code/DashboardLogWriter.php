@@ -56,6 +56,14 @@ class DashboardLogWriter extends Zend_Log_Writer_Abstract {
 		$this->storage = DashboardSessionStorage::inst();
 	}
 
+	/**
+     * Write a message to the log. If the message contains HTML/XML,
+	 *  the caller is responsible for setting $event['XMLSafe']
+	 *  to an XML safe representation.
+	 * 
+	 * @see Zend_Log_Writer_Abstract
+	 * @param type $event
+	 */
 	public function _write($event) {
 		/*
 		 * TODO We currently throw away all additional information

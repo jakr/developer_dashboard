@@ -1,10 +1,22 @@
 <?php
-class DashboardLogController extends Controller  implements DashboardPanelContentProvider {
+/**
+ * The Controller for the dashboard log pabel.
+ */
+class DashboardLogController extends Controller implements DashboardPanelContentProvider {
+	/**
+	 * Add the log panel to the Dashboard.
+	 */
 	public static function add_log_panel(){
 		$dlc = new DashboardLogController();
 		$dlc->addLogPanel();
 	}
 	
+	/**
+	 * Get log data stored in the session.
+	 * If a parameter is supplied via the URL, only requests newer than that
+	 *  are returned.
+	 * @return ArrayList
+	 */
 	public function GetLoggedData(){
 		$param = $this->request->latestParam('ID');
 		$newerThan = $param === null ? 0 : $param;
@@ -14,7 +26,7 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 	/**
 	 * This is an action controller that returns the newest log messages.
 	 * It gets called via AJAX.
-	 * 
+	 * @return string the HTML.
 	 */
 	public function getlog($request = null){
 		if($request != null) {
@@ -23,6 +35,12 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 		return $this->renderWith('DeveloperDashboardLogAjax');
 	}
 	
+	/**
+	 * Get a button to control the display of the stream specified by the 
+	 *  URL parameter.
+	 * @param SS_HTTPRequest $request
+	 * @return string the HTML
+	 */
 	public function getstreambutton(SS_HTTPRequest $request = null){
 		if($request == null) return;
 		$ad = new ArrayData(array('Title'=>$request->latestParam('ID')));
@@ -58,6 +76,9 @@ class DashboardLogController extends Controller  implements DashboardPanelConten
 		$panel->addFormField($logarea->performReadonlyTransformation());
 	}
 	
+	/**
+	 * Does the work for adding the log panel to the Dashboard.
+	 */
 	private function addLogPanel(){
 		$panel = new DashboardPanel('Logs');
 		$panel->setContentProvider($this);

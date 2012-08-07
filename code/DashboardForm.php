@@ -1,4 +1,12 @@
 <?php
+/**
+ * The Form that is displayed in the Dashboard.
+ * 
+ * It takes care of forwarding submissions to the Panels' Controllers.
+ * 
+ * Currently, there is no special handling of sub fields. If this is required,
+ *  it is necessary to override handleField().
+ */
 class DashboardForm extends Form {
 	
 	private $callbacks = array();
@@ -11,6 +19,10 @@ class DashboardForm extends Form {
 		}
 	}
 	
+	/**
+	 * Add a panel to the Form. Each Panel will be diesplayed in a Tab.
+	 * @param DashboardPanel $panel
+	 */
 	public function addPanel(DashboardPanel $panel) {
 		//Get information from $panel and add it to our form
 		//@TODO: Preserve tab hierarchy.
@@ -29,6 +41,14 @@ class DashboardForm extends Form {
 		}
 	}
 	
+	/**
+	 * Check if the Form contains the FormField $fieldName in the Tab $panelName.
+	 * 
+	 * Used for testing.
+	 * @param string $panelName
+	 * @param string $fieldName
+	 * @return boolean
+	 */
 	public function findField($panelName, $fieldName) {
 		return $this->fields->fieldByName("Root.$panelName.$fieldName");
 	}
@@ -91,11 +111,4 @@ class DashboardForm extends Form {
 		
 		return parent::httpSubmission($request);
 	}
-	
-	public function handleField($request) {
-		echo $request->param('FieldName');
-		//TODO: intercept/redirect
-		return parent::handleField($request);
-	}
-	
 }

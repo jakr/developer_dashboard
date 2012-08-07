@@ -1,6 +1,17 @@
 <?php
+/**
+ * The main class for the developer dashboard.
+ * 
+ * This class provides the view of the dashboard at baseURL/DeveloperDashboard.
+ * To add a panel / tab to the dashboard, call addPanel().
+ * @see DashboardPanel
+ * 
+ * It is also responsible for displaying the "Open Dashboard" link.
+ *  This is done in __destruct.
+ */
 class DeveloperDashboard extends Controller {
 	
+	/** @var DeveloperDashboard the singleton instance.*/
 	private static $instance = null;
 	/** @var DashboardForm the form */
 	private $form = null;
@@ -37,6 +48,13 @@ class DeveloperDashboard extends Controller {
 		
 	}
 
+	/**
+	 * Overwrites the default action handler in Controller in order to forward
+	 *  actions that were added to the panels.
+	 * 
+	 * @param type $request
+	 * @return mixed
+	 */
 	public function handleAction($request){
 		//Setting $allowed_actions would not account for those added by others.
 		if(Director::get_environment_type() != 'dev'){
@@ -56,6 +74,11 @@ class DeveloperDashboard extends Controller {
 		}
 	}
 	
+	/**
+	 * Destructor.
+	 * 
+	 * Displays the "Open Dashboard" link.
+	 */
 	public function __destruct(){
 		if(Director::get_environment_type() == 'dev' 
 			&& !Director::is_ajax()
@@ -69,6 +92,10 @@ class DeveloperDashboard extends Controller {
 		}
 	}
 	
+	/**
+	 * Add a panel. @see DashboardPanel for more information.
+	 * @param DashboardPanel $panel
+	 */
 	public function addPanel(DashboardPanel $panel){
 		self::$storedPanels[] = $panel;
 		foreach($panel->Actions() as $actionName => $callbackInfo){
@@ -76,6 +103,11 @@ class DeveloperDashboard extends Controller {
 		}
 	}
 
+	/**
+	 * Internal function used to add the panels to the form after it was
+	 *  initialized.
+	 * @throws UnexpectedValueException if $this->form was not initialized.
+	 */
 	private function addStoredPanels(){
 		if(!$this->form){
 			throw new UnexpectedValueException(
@@ -88,6 +120,10 @@ class DeveloperDashboard extends Controller {
 		self::$storedPanels = array(); //clear stored panels
 	}
 	
+	/**
+	 * Get the form.
+	 * @return DashboardForm
+	 */
 	public function DashboardForm(){
 		return $this->form;
 	}

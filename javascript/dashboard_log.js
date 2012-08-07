@@ -41,7 +41,7 @@ function dashboardLogGetNewData(buttonID, refreshRate) {
 		}
 		hideOldRequests();
 	});
-	startUpdate(buttonID, refreshRate);
+	startUpdateCountdown(buttonID, refreshRate);
 }
 
 // Hide all requests older than the limit set in the show_last_requests dropdown.
@@ -68,7 +68,7 @@ function getNewButton(streamID){
 }
 
 // Start automatic update countdown for the button with id buttonID
-function startUpdate(buttonID, refreshRate){
+function startUpdateCountdown(buttonID, refreshRate){
 	var button = jQuery('#ARB-' + buttonID);
 	if(button.hasClass('off')){
 		button.removeClass('off').children('.btn').addClass('btn-success').text('On');
@@ -82,7 +82,7 @@ function startUpdate(buttonID, refreshRate){
 }
 
 // Stop automatic update for the button with id buttonID
-function stopUpdate(buttonID){
+function stopUpdateCountdown(buttonID){
 	jQuery('#ssdd-progress-bar-' + buttonID).stop().css('width', '4em');
 	jQuery('#ARB-' + buttonID).addClass('off').children('.btn')
 		.removeClass('btn-success').text('Off');
@@ -113,10 +113,10 @@ function hideOtherStreams(showStreamID){
 //click on the "toggle update" button, enables or disables updates via AJAX.
 jQuery(function(){jQuery('#ARB-Update').toggle(
 	function() {
-		startUpdate('Update', 5000);
+		startUpdateCountdown('Update', 5000);
 	},
 	function() {
-		stopUpdate('Update');
+		stopUpdateCountdown('Update');
 	}
 )});
 

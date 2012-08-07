@@ -1,4 +1,7 @@
 <?php
+/**
+ * A filter used to enable and disable log streams.
+ */
 require_once 'Zend/Log/Filter/Interface.php';
 class DashboardLogFilter implements Zend_Log_Filter_Interface {
 	private $enabled = true;

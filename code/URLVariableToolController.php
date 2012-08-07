@@ -1,4 +1,7 @@
 <?php
+/**
+ * The controller for the URL variable tools panel / tab.
+ */
 class URLVariableToolController extends Controller {
 	private static $action_names = array(
 		'debug' => '1',

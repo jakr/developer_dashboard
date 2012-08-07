@@ -1,8 +1,11 @@
 <?php
 /**
- * Singleton class.
+ * Store settings and log messages in the session.
+ * 
+ * Singleton class
  */
 class DashboardSessionStorage {
+	/** @var DashboardSessionStorage the singleton instance. */
 	private static $instance = null;
 	/** @var int Number of requests that are stored in the session */
 	public static $requests_to_keep = 10;
@@ -13,8 +16,12 @@ class DashboardSessionStorage {
 	 * This is an entry in the array $_SESSION[$session_key].
 	 */
 	private static $log_message_key = 'LOG_MESSAGES';
-	
+	/** @var array the data that is stored in the session */
 	private $sessionData = array();
+	/** 
+	 * @var int the number of the current request. 
+	 * Requests that do not generate log data are not counted.
+	 */
 	private $requestNumber = -1;
 	
 	
@@ -60,11 +67,22 @@ class DashboardSessionStorage {
 		return self::$instance;
 	}
 	
+	/**
+	 * Store $value under the key $name.
+	 * @param type $name
+	 * @param type $value
+	 */
 	public function storeSetting($name, $value){
 		$this->sessionData[$name] = $value;
 		$this->updateSession();
 	}
 	
+	/**
+	 * Load a previously stored value. If nothing was stored under $name, 
+	 *  false is returned.
+	 * @param string $name
+	 * @return mixed
+	 */
 	public function loadSetting($name){
 		if(!isset($this->sessionData[$name])){
 			return false;
@@ -73,7 +91,11 @@ class DashboardSessionStorage {
 		}		
 	}
 	
-	public function storeMessageObject($messageObj) {
+	/**
+	 * Store a DashboardLogMessage object in the session.
+	 * @param DashboardLogMessage $messageObj
+	 */
+	public function storeMessageObject(DashboardLogMessage $messageObj) {
 		if(!isset($this->sessionData[self::$log_message_key][$this->requestNumber])){
 			//Append new array for messages written by this request.
 			$this->sessionData[self::$log_message_key][$this->requestNumber] = array(
@@ -132,6 +154,10 @@ class DashboardSessionStorage {
 		return $requests;
 	}
 	
+	/**
+	 * Update the session. Call this method after every change to the data, 
+	 *  to make sure that the session stores the most recent values.
+	 */
 	private function updateSession(){
 		Session::set(self::$session_key, $this->sessionData);
 		Session::save();

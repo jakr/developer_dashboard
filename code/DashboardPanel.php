@@ -69,9 +69,10 @@ class DashboardPanel {
 	/**
 	 * Allows to update the panel's content before it is displayed.
 	 * 
-	 * The method getPanelContent is called on $provider before the form is displayed.
-	 * This can be used to add content that was not available when this panel 
-	 *  was constructed, such as data from the session or the database.
+	 * The method getPanelContent is called on $provider before the form is
+	 *  displayed. This can be used to add content that was not available when
+	 *  this panel was constructed, such as data from the session or the
+	 *  database.
 	 * @param DashboardPanelContentProvider $provider
 	 */
 	public function setContentProvider(DashboardPanelContentProvider $provider) {
@@ -119,7 +120,8 @@ class DashboardPanel {
 	 * @param FormField $formField
 	 * @param Controller $controller
 	 * @param string $methodName
-	 * @throws InvalidArgumentException if a controller is set, but no callback method can be found.
+	 * @throws InvalidArgumentException if a controller is set, but no callback
+	 *  method can be found.
 	 */
 	public function addFormField(FormField $formField,
 		Controller $controller = null, $methodName = null
@@ -156,6 +158,8 @@ class DashboardPanel {
 	 * 
 	 * This allows to forward the action $action from the DeveloperDashboard to
 	 *  a different controller.
+	 * If $action already exists in the DeveloperDashboard, it will be
+	 *  overwritten.
 	 * 
 	 * @param string $action the name of the action
 	 * @param Controller $controller

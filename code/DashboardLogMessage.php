@@ -1,8 +1,12 @@
 <?php
+/**
+ * Data object for a log message.
+ */
 class DashboardLogMessage extends ViewableData {
 	public $StreamID;
 	public $Timestamp;
 	public $Message;
+	public $XMLSafeMessage;
 	
 	/**
 	 * Construct from a Zend_Log message.
@@ -11,17 +15,27 @@ class DashboardLogMessage extends ViewableData {
 	 */
 	public function __construct($event, $streamID){
 		$this->Message = $event['message'];
+		$this->XMLSafeMessage = isset($event['XMLSafe']) ? $event['XMLSafe'] : null;
 		$this->StreamID = $streamID;
 		$this->Timestamp = $event['timestamp'];
 	}
 	
+	/**
+	 * Cast the object to a string.
+	 * @return string
+	 */
 	public function __toString(){
 		return "[{$this->StreamID}] {$this->Timestamp} {$this->Message}";
 	}
 	
+	/**
+	 * Get an XML safe representation of this object.
+	 * @return string
+	 */
 	public function toXML(){
-		return (string)$this;
-		//return '<p class="">'.(string)$this.'</p>';
+		return "[{$this->StreamID}] {$this->Timestamp} "
+			.$this->XMLSafeMessage != null ? $this->XMLSafeMessage 
+				: Convert::raw2xml($this->Message);
 	}
 	
 	/**

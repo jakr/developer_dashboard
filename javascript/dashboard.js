@@ -1,18 +1,25 @@
 var SSDD_refreshRate = 5000;
-var updateIntervalId = null;
 
 // Run an AJAX request to get new log messages from the server.
 function dashboardLogGetNewData(buttonID, refreshRate) {
 	var timestampHidden = jQuery('.Timestamp').first().hasClass('hide');
-	var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
-	var newestLogEntry = 0;
-	if(typeof lastEntry != 'undefined') {
-		newestLogEntry = lastEntry.className.split(' ')[1];
-	}
 	var url = window.location.pathname;
 	//append slash (if missing).
-	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' ) 
-		+ 'getlog/' + newestLogEntry;
+	url = url + (url.charAt(url.length - 1) == '/' ? '' : '/' );
+	if(buttonID == 'action_getlog'){
+		var lastEntry = jQuery(".SSDD-log-area .request").last().get(0);
+		var	newestLogEntry = 0;
+		if(typeof lastEntry != 'undefined') {
+			newestLogEntry = lastEntry.className.split(' ')[1];
+		}
+		url = url + 'getlog/' + newestLogEntry;
+	} else {
+		console.log(buttonID);
+		var filename = jQuery('#Root_Files .SelectionGroup :checked').val();
+		var offset = jQuery('#Root_Files .SelectionGroup .'+filename+'-posEOF').last().html();
+		url = url + 'readlogfile/' + filename + '/' + offset ;
+		console.log(url);
+	}
 
 	//flash the off/on button to indicate that it is active.
 	jQuery('#ARB-' + buttonID).children().first().css('opacity', 0.5)
@@ -34,12 +41,20 @@ function dashboardLogGetNewData(buttonID, refreshRate) {
 				jQuery(this).children('.Timestamp').addClass('hide');
 			}
 		});
-		var area = jQuery('.SSDD-log-area').append(jqData);
-		area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
-		for(var streamID in missing){
-			getNewButton(streamID);
+		var area = null;
+		if(buttonID == 'action_getlog'){
+			area = jQuery('.SSDD-log-area').append(jqData);
+		} else {
+			var filename = jQuery('#Root_Files .SelectionGroup :checked').val();
+			area = jQuery('.SSDD-log-file-area-'+filename).append(jqData);
 		}
-		hideOldRequests();
+		area.animate({ scrollTop: area.prop('scrollHeight') - area.height() }, 300);
+		if(buttonID == 'action_getlog'){
+			for(var streamID in missing){
+				getNewButton(streamID);
+			}
+			hideOldRequests();
+		}
 	});
 	startUpdateCountdown(buttonID, refreshRate);
 }
@@ -111,14 +126,24 @@ function hideOtherStreams(showStreamID){
 }
 
 //click on the "toggle update" button, enables or disables updates via AJAX.
-jQuery(function(){jQuery('#ARB-action_getlog').toggle(
-	function() {
-		startUpdateCountdown('action_getlog', 5000);
-	},
-	function() {
-		stopUpdateCountdown('action_getlog');
-	}
-)});
+jQuery(function(){
+	jQuery('#ARB-action_getlog').toggle(
+		function() {
+			startUpdateCountdown('action_getlog', 5000);
+		},
+		function() {
+			stopUpdateCountdown('action_getlog');
+		}
+	);
+	jQuery('#ARB-action_readlogfile').toggle(
+		function() {
+			startUpdateCountdown('action_readlogfile', 5000);
+		},
+		function() {
+			stopUpdateCountdown('action_readlogfile');
+		}
+	);
+});
 
 //Show / Hide Timestamps. Could be done using toggleClass,
 // but this way it will fix elements that have the wrong state. 
@@ -172,4 +197,15 @@ jQuery(function(){
 	for(var streamID in missing){
 		getNewButton(streamID);
 	}
+});
+
+jQuery(function(){
+	jQuery('#Root_Files .SelectionGroup input').change(function(event){
+		if(!event.target.checked) return;
+		console.log(event.target.value);
+		jQuery('#Root_Files .SelectionGroup .CompositeField').addClass('hide');
+		jQuery('#Root_Files .SSDD-log-file-area-'+event.target.value).removeClass('hide');
+	});
+	jQuery('#Root_Files .SelectionGroup input').first().click();
+	//.first().attr('checked', 'checked')
 });

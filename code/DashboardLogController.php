@@ -87,8 +87,6 @@ class DashboardLogController extends Controller implements DashboardPanelContent
 		$panel->forwardAction('getstreambutton', $this);
 		DeveloperDashboard::inst()->addPanel($panel);
 		Requirements::css('developer_dashboard/css/ss_developer_dashboard_log.css');
-		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
-		Requirements::javascript('developer_dashboard/javascript/dashboard_log.js');
 	}
 	
 }

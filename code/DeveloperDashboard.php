@@ -39,6 +39,7 @@ class DeveloperDashboard extends Controller {
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.min.js');
 		Requirements::javascript('developer_dashboard/thirdparty/bootstrap/js/bootstrap.min.js');
 		Requirements::css('developer_dashboard/thirdparty/bootstrap/css/bootstrap.min.css');
+		Requirements::javascript('developer_dashboard/javascript/dashboard.js');
 		
 		$this->form = new DashboardForm($this, 'DashboardForm', 
 			new FieldList(new TabSet("Root")), 

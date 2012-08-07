@@ -103,7 +103,7 @@ class DeveloperDashboardTest extends SapphireTest {
 		$this->writeToTestFile($this->messages[0]."\n");
 		DashboardLogFile::register_log_file('TEST', $this->testFilePath);
 		//read
-		$res1 = DashboardLogFile::read_log_file(-1, 'TEST');
+		$res1 = DashboardLogFile::read_log_file(0, 'TEST');
 		$offset = $res1['last'];
 		$this->assertEquals($this->messages[0]."\n", $res1['text'][0]);
 		
@@ -111,7 +111,7 @@ class DeveloperDashboardTest extends SapphireTest {
 		//write
 		$this->writeToTestFile($this->messages[1]."\n");
 		//read all
-		$res2 = DashboardLogFile::read_log_file(-1, 'TEST');
+		$res2 = DashboardLogFile::read_log_file(0, 'TEST');
 		$this->assertEquals($this->messages[0]."\n", $res2['text'][0]);
 		$this->assertEquals($this->messages[1]."\n", $res2['text'][1]);
 		//read only new

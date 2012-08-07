@@ -47,26 +47,53 @@ class DashboardLogFile {
 
 	/**
 	 * Read the log file from disk, starting at $offset.
+	 *  Negative values of offset indicate lines from the end.
 	 * 
 	 * @param int $offset
 	 * @return array with two keys:
 	 *  'last' is the offset of the last line
 	 *  'text' is an array of lines.
 	 */
-	public static function read_log_file($offset=-1, $logFileName = 'DEFAULT') {
+	public static function read_log_file($offset=0, $logFileName = 'DEFAULT') {
 		if(!isset(self::$available_log_files[$logFileName])){
 			return 'Unknown log file';
 		}
 		
 		$path = self::$available_log_files[$logFileName];
 		$lines = array();
-		if($offset < 0) $offset = 0;
+		
 		$file = fopen($path, 'r');
-		fseek($file, 0, SEEK_END);
-		$posEOF = ftell($file);
-		fseek($file, $offset);
-		while($line = fgets($file)){
-			$lines[] = $line;
+        $posEOF = filesize($path);
+		if($offset >= 0){
+			fseek($file, $offset);
+			while($line = fgets($file)){
+				$lines[] = $line;
+			}
+		} else {
+			//code from http://www.codediesel.com/php/tail-functionality-in-php/
+			$target_lines = -$offset;
+			$block = 4096;
+			$data = '';
+			$found_lines = 0;
+			for($len = 0; $len < $posEOF; $len += $block) {
+				$seekSize = ($posEOF - $len > $block) ? $block : $posEOF - $len;
+				fseek($file, ($len + $seekSize) * -1, SEEK_END);
+				$newData = fread($file, $seekSize);
+				$data = $newData . $data;
+				$found_lines += substr_count($newData, "\n");
+				
+				if($found_lines >= $target_lines  + 1) {
+					/* Make sure that the last line ends with a '\n' */
+					if(substr($data, strlen($data)-1, 1) !== "\n") {
+						$data .= "\n";
+					}
+					break;
+				}
+			}
+			$lines = explode("\n", $data);
+			if(count($lines) > $target_lines){ //Omit excess lines.
+				$lines = array_slice($lines, count($lines) - $target_lines - 1);
+			}
 		}
 		fclose($file);
 		return array('last' => $posEOF, 'text' => $lines);	

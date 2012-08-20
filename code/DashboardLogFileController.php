@@ -4,7 +4,7 @@
  */
 class DashboardLogFileController extends Controller implements DashboardPanelContentProvider {
 	private $fileKey;
-	private $offset = -20;
+	private $offset = -100;
 	
 	public static function add_log_file_panel(){
 		$dlfc = new self();

@@ -215,7 +215,7 @@ jQuery(function(){
 //check that all required buttons are present and load missing ones.
 jQuery(function(){
 	var missing = new Object();
-	jQuery('.SSDD-log-area .request div').each(function(){
+	jQuery('.SSDD-log-area .request > div').each(function(){
 		if(jQuery('#set-stream-visibility-'+this.className).length == 0){
 			missing[this.className] = true;
 		}
